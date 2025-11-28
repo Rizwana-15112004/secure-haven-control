@@ -1,0 +1,231 @@
+import { 
+  Occupant, 
+  Camera, 
+  Alert, 
+  BuildingZone, 
+  ControlSystem, 
+  RescueTeam,
+  EmergencyStats,
+  SensorData
+} from '@/types';
+
+// Mock Occupants Data
+export const mockOccupants: Occupant[] = [
+  {
+    id: '1',
+    tempUID: 'TUID-001',
+    name: 'Rajesh Kumar',
+    department: 'Engineering',
+    floor: 3,
+    zone: 'A',
+    location: { lat: 12.9716, lng: 77.5946 },
+    status: 'stuck',
+    healthCondition: 'moderate',
+    preExistingConditions: ['Asthma'],
+    injuryStatus: 'Smoke inhalation',
+    entryTime: new Date('2024-01-15T09:00:00'),
+    lastSeen: new Date(),
+    triageScore: 85,
+    contactNumber: '+91 98765 43210',
+    emergencyContact: '+91 98765 43211',
+  },
+  {
+    id: '2',
+    tempUID: 'TUID-002',
+    name: 'Priya Sharma',
+    department: 'HR',
+    floor: 2,
+    zone: 'B',
+    location: { lat: 12.9720, lng: 77.5950 },
+    status: 'safe',
+    healthCondition: 'healthy',
+    preExistingConditions: [],
+    injuryStatus: 'None',
+    entryTime: new Date('2024-01-15T08:30:00'),
+    lastSeen: new Date(),
+    triageScore: 20,
+    contactNumber: '+91 98765 43212',
+    emergencyContact: '+91 98765 43213',
+  },
+  {
+    id: '3',
+    tempUID: 'TUID-003',
+    name: 'Mohammed Ali',
+    department: 'Security',
+    floor: 4,
+    zone: 'C',
+    location: { lat: 12.9718, lng: 77.5948 },
+    status: 'stuck',
+    healthCondition: 'critical',
+    preExistingConditions: ['Heart condition', 'Diabetes'],
+    injuryStatus: 'Burns on left arm',
+    entryTime: new Date('2024-01-15T07:00:00'),
+    lastSeen: new Date(),
+    triageScore: 95,
+    contactNumber: '+91 98765 43214',
+    emergencyContact: '+91 98765 43215',
+  },
+  {
+    id: '4',
+    tempUID: 'TUID-004',
+    name: 'Sarah Johnson',
+    department: 'Finance',
+    floor: 1,
+    zone: 'A',
+    location: { lat: 12.9714, lng: 77.5944 },
+    status: 'rescued',
+    healthCondition: 'minor',
+    preExistingConditions: [],
+    injuryStatus: 'Minor cuts',
+    entryTime: new Date('2024-01-15T09:15:00'),
+    lastSeen: new Date(),
+    triageScore: 30,
+    contactNumber: '+91 98765 43216',
+    emergencyContact: '+91 98765 43217',
+  },
+  {
+    id: '5',
+    tempUID: 'TUID-005',
+    name: 'Amit Patel',
+    department: 'IT',
+    floor: 3,
+    zone: 'B',
+    location: { lat: 12.9722, lng: 77.5952 },
+    status: 'stuck',
+    healthCondition: 'severe',
+    preExistingConditions: ['Mobility impaired'],
+    injuryStatus: 'Unable to move',
+    entryTime: new Date('2024-01-15T08:45:00'),
+    lastSeen: new Date(),
+    triageScore: 92,
+    contactNumber: '+91 98765 43218',
+    emergencyContact: '+91 98765 43219',
+  },
+];
+
+// Mock Cameras
+export const mockCameras: Camera[] = [
+  { id: 'CAM-001', name: 'Lobby Main', floor: 1, zone: 'A', status: 'online', streamUrl: '/camera/1', isLocal: true },
+  { id: 'CAM-002', name: 'Floor 2 Corridor', floor: 2, zone: 'A', status: 'online', streamUrl: '/camera/2', isLocal: true },
+  { id: 'CAM-003', name: 'Floor 3 East Wing', floor: 3, zone: 'A', status: 'online', streamUrl: '/camera/3', isLocal: true },
+  { id: 'CAM-004', name: 'Floor 3 West Wing', floor: 3, zone: 'B', status: 'recording', streamUrl: '/camera/4', isLocal: true },
+  { id: 'CAM-005', name: 'Floor 4 Server Room', floor: 4, zone: 'C', status: 'online', streamUrl: '/camera/5', isLocal: true },
+  { id: 'CAM-006', name: 'Stairwell A', floor: 0, zone: 'A', status: 'online', streamUrl: '/camera/6', isLocal: true },
+  { id: 'CAM-007', name: 'Emergency Exit B', floor: 0, zone: 'B', status: 'offline', streamUrl: '/camera/7', isLocal: true },
+  { id: 'CAM-008', name: 'Parking Level', floor: -1, zone: 'A', status: 'online', streamUrl: '/camera/8', isLocal: true },
+];
+
+// Mock Alerts
+export const mockAlerts: Alert[] = [
+  {
+    id: 'ALT-001',
+    type: 'fire',
+    level: 'critical',
+    message: 'FIRE DETECTED - Floor 3, Zone A - Immediate evacuation required',
+    floor: 3,
+    zone: 'A',
+    timestamp: new Date(),
+    isActive: true,
+    acknowledged: false,
+    sensor: 'SMOKE-3A-01',
+  },
+  {
+    id: 'ALT-002',
+    type: 'gas',
+    level: 'warning',
+    message: 'Elevated CO levels detected - Floor 4, Zone C',
+    floor: 4,
+    zone: 'C',
+    timestamp: new Date(Date.now() - 300000),
+    isActive: true,
+    acknowledged: true,
+    sensor: 'GAS-4C-02',
+  },
+  {
+    id: 'ALT-003',
+    type: 'structural',
+    level: 'danger',
+    message: 'Structural integrity warning - Floor 3, Zone B - Vibration sensors triggered',
+    floor: 3,
+    zone: 'B',
+    timestamp: new Date(Date.now() - 600000),
+    isActive: true,
+    acknowledged: false,
+    sensor: 'VIB-3B-01',
+  },
+];
+
+// Mock Sensors
+const createSensors = (floor: number, zone: string): SensorData[] => [
+  {
+    id: `SMOKE-${floor}${zone}-01`,
+    type: 'smoke',
+    value: floor === 3 && zone === 'A' ? 85 : Math.random() * 20,
+    threshold: 50,
+    unit: 'ppm',
+    status: floor === 3 && zone === 'A' ? 'critical' : 'safe',
+    lastUpdate: new Date(),
+  },
+  {
+    id: `TEMP-${floor}${zone}-01`,
+    type: 'temperature',
+    value: floor === 3 && zone === 'A' ? 78 : 22 + Math.random() * 5,
+    threshold: 60,
+    unit: '°C',
+    status: floor === 3 && zone === 'A' ? 'danger' : 'safe',
+    lastUpdate: new Date(),
+  },
+  {
+    id: `GAS-${floor}${zone}-01`,
+    type: 'gas',
+    value: floor === 4 && zone === 'C' ? 45 : Math.random() * 15,
+    threshold: 35,
+    unit: 'ppm',
+    status: floor === 4 && zone === 'C' ? 'warning' : 'safe',
+    lastUpdate: new Date(),
+  },
+];
+
+// Mock Building Zones
+export const mockZones: BuildingZone[] = [
+  { id: 'Z-1A', name: 'Ground Floor - Lobby', floor: 1, status: 'safe', occupantCount: 12, sensors: createSensors(1, 'A'), evacPath: 'safe' },
+  { id: 'Z-2A', name: 'Floor 2 - Admin', floor: 2, status: 'safe', occupantCount: 25, sensors: createSensors(2, 'A'), evacPath: 'safe' },
+  { id: 'Z-2B', name: 'Floor 2 - HR', floor: 2, status: 'warning', occupantCount: 15, sensors: createSensors(2, 'B'), evacPath: 'safe' },
+  { id: 'Z-3A', name: 'Floor 3 - Engineering', floor: 3, status: 'critical', occupantCount: 8, sensors: createSensors(3, 'A'), evacPath: 'danger' },
+  { id: 'Z-3B', name: 'Floor 3 - R&D', floor: 3, status: 'danger', occupantCount: 5, sensors: createSensors(3, 'B'), evacPath: 'blocked' },
+  { id: 'Z-4A', name: 'Floor 4 - Executive', floor: 4, status: 'warning', occupantCount: 3, sensors: createSensors(4, 'A'), evacPath: 'safe' },
+  { id: 'Z-4C', name: 'Floor 4 - Server Room', floor: 4, status: 'warning', occupantCount: 2, sensors: createSensors(4, 'C'), evacPath: 'safe' },
+];
+
+// Mock Control Systems
+export const mockControls: ControlSystem[] = [
+  { id: 'CTRL-ALM-01', name: 'Building Alarm', type: 'alarm', floor: 0, zone: 'ALL', status: 'on', isManualOverride: false },
+  { id: 'CTRL-SPR-3A', name: 'Sprinkler 3A', type: 'sprinkler', floor: 3, zone: 'A', status: 'on', isManualOverride: false },
+  { id: 'CTRL-SPR-3B', name: 'Sprinkler 3B', type: 'sprinkler', floor: 3, zone: 'B', status: 'auto', isManualOverride: false },
+  { id: 'CTRL-DOOR-EM1', name: 'Emergency Exit 1', type: 'door', floor: 1, zone: 'A', status: 'on', isManualOverride: true },
+  { id: 'CTRL-DOOR-EM2', name: 'Emergency Exit 2', type: 'door', floor: 2, zone: 'B', status: 'on', isManualOverride: false },
+  { id: 'CTRL-VENT-01', name: 'Smoke Extraction', type: 'ventilation', floor: 0, zone: 'ALL', status: 'on', isManualOverride: false },
+  { id: 'CTRL-PWR-EM', name: 'Emergency Power', type: 'power', floor: 0, zone: 'ALL', status: 'on', isManualOverride: false },
+  { id: 'CTRL-LGT-EVA', name: 'Evacuation Lights', type: 'light', floor: 0, zone: 'ALL', status: 'on', isManualOverride: false },
+];
+
+// Mock Rescue Teams
+export const mockRescueTeams: RescueTeam[] = [
+  { id: 'RT-INT', name: 'Internal Safety Team', type: 'internal', status: 'on_scene', contactNumber: '+91 1800 123 001', notifiedAt: new Date() },
+  { id: 'RT-FIRE', name: 'Fire Department', type: 'fire_dept', status: 'dispatched', eta: 8, contactNumber: '101', notifiedAt: new Date() },
+  { id: 'RT-MED', name: 'Ambulance Service', type: 'medical', status: 'alerted', eta: 12, contactNumber: '108', notifiedAt: new Date() },
+  { id: 'RT-POL', name: 'Local Police', type: 'police', status: 'standby', contactNumber: '100' },
+];
+
+// Emergency Statistics
+export const mockStats: EmergencyStats = {
+  totalOccupants: 70,
+  safeOccupants: 52,
+  stuckOccupants: 13,
+  rescuedOccupants: 5,
+  injuredOccupants: 8,
+  casualtyCount: 0,
+  activeAlerts: 3,
+  floorsAffected: 2,
+  evacuationProgress: 74,
+};
