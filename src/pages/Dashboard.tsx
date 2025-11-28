@@ -157,96 +157,210 @@ export default function Dashboard() {
             </div>
           )}
 
-          {/* Stats Row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4 mb-6">
-            <StatsCard
-              title="Total Occupants"
-              value={stats.totalOccupants}
-              icon={Users}
-              variant="info"
-            />
-            <StatsCard
-              title="Safe"
-              value={stats.safeOccupants + stats.rescuedOccupants}
-              icon={UserCheck}
-              variant="safe"
-            />
-            <StatsCard
-              title="Stuck"
-              value={stats.stuckOccupants}
-              icon={UserX}
-              variant="danger"
-            />
-            <StatsCard
-              title="Active Alerts"
-              value={activeAlerts.length}
-              icon={AlertTriangle}
-              variant={activeAlerts.length > 0 ? 'danger' : 'safe'}
-            />
-            <StatsCard
-              title="Injured"
-              value={stats.injuredOccupants}
-              icon={Shield}
-              variant="warning"
-            />
-            <StatsCard
-              title="Floors Affected"
-              value={stats.floorsAffected}
-              icon={Flame}
-              variant={stats.floorsAffected > 0 ? 'warning' : 'safe'}
-            />
-          </div>
-
-          {/* Main Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-            {/* Left Column */}
-            <div className="lg:col-span-2 space-y-4 md:space-y-6">
-              {/* CCTV */}
-              <CCTVPanel 
-                cameras={mockCameras} 
-                onCameraSelect={handleCameraSelect}
-              />
-
-              {/* Building Map + Alerts */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <BuildingMap 
-                  zones={mockZones} 
-                  occupants={occupants}
-                  onZoneSelect={handleZoneSelect}
+          {/* Dashboard View */}
+          {activeTab === 'dashboard' && (
+            <>
+              {/* Stats Row */}
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4 mb-6">
+                <StatsCard
+                  title="Total Occupants"
+                  value={stats.totalOccupants}
+                  icon={Users}
+                  variant="info"
                 />
-                <AlertsPanel 
-                  alerts={alerts} 
-                  onAcknowledge={handleAcknowledgeAlert}
+                <StatsCard
+                  title="Safe"
+                  value={stats.safeOccupants + stats.rescuedOccupants}
+                  icon={UserCheck}
+                  variant="safe"
+                />
+                <StatsCard
+                  title="Stuck"
+                  value={stats.stuckOccupants}
+                  icon={UserX}
+                  variant="danger"
+                />
+                <StatsCard
+                  title="Active Alerts"
+                  value={activeAlerts.length}
+                  icon={AlertTriangle}
+                  variant={activeAlerts.length > 0 ? 'danger' : 'safe'}
+                />
+                <StatsCard
+                  title="Injured"
+                  value={stats.injuredOccupants}
+                  icon={Shield}
+                  variant="warning"
+                />
+                <StatsCard
+                  title="Floors Affected"
+                  value={stats.floorsAffected}
+                  icon={Flame}
+                  variant={stats.floorsAffected > 0 ? 'warning' : 'safe'}
                 />
               </div>
-            </div>
 
-            {/* Right Column */}
-            <div className="space-y-4 md:space-y-6">
-              {/* Evacuation Progress */}
-              <EvacuationProgress stats={stats} />
+              {/* Main Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+                {/* Left Column */}
+                <div className="lg:col-span-2 space-y-4 md:space-y-6">
+                  {/* CCTV */}
+                  <CCTVPanel 
+                    cameras={mockCameras} 
+                    onCameraSelect={handleCameraSelect}
+                  />
 
-              {/* Occupants List */}
-              <div className="h-[400px]">
-                <OccupantsList 
-                  occupants={occupants}
-                  onOccupantSelect={handleOccupantSelect}
+                  {/* Building Map + Alerts */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <BuildingMap 
+                      zones={mockZones} 
+                      occupants={occupants}
+                      onZoneSelect={handleZoneSelect}
+                    />
+                    <AlertsPanel 
+                      alerts={alerts} 
+                      onAcknowledge={handleAcknowledgeAlert}
+                    />
+                  </div>
+                </div>
+
+                {/* Right Column */}
+                <div className="space-y-4 md:space-y-6">
+                  {/* Evacuation Progress */}
+                  <EvacuationProgress stats={stats} />
+
+                  {/* Occupants List */}
+                  <div className="h-[400px]">
+                    <OccupantsList 
+                      occupants={occupants}
+                      onOccupantSelect={handleOccupantSelect}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-6">
+                <ControlPanel 
+                  controls={controls}
+                  onControlToggle={handleControlToggle}
+                />
+                <RescueTeamsPanel 
+                  teams={rescueTeams}
+                  onAlertTeam={handleAlertTeam}
                 />
               </div>
-            </div>
-          </div>
+            </>
+          )}
 
-          {/* Bottom Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-6">
-            <ControlPanel 
-              controls={controls}
-              onControlToggle={handleControlToggle}
-            />
-            <RescueTeamsPanel 
-              teams={rescueTeams}
-              onAlertTeam={handleAlertTeam}
-            />
-          </div>
+          {/* Monitoring View */}
+          {activeTab === 'monitoring' && (
+            <div className="space-y-6">
+              <h2 className="font-display text-2xl font-bold">Sensor Monitoring</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <StatsCard title="Total Occupants" value={stats.totalOccupants} icon={Users} variant="info" />
+                <StatsCard title="Safe" value={stats.safeOccupants + stats.rescuedOccupants} icon={UserCheck} variant="safe" />
+                <StatsCard title="Stuck" value={stats.stuckOccupants} icon={UserX} variant="danger" />
+                <StatsCard title="Active Alerts" value={activeAlerts.length} icon={AlertTriangle} variant={activeAlerts.length > 0 ? 'danger' : 'safe'} />
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <AlertsPanel alerts={alerts} onAcknowledge={handleAcknowledgeAlert} />
+                <EvacuationProgress stats={stats} />
+              </div>
+            </div>
+          )}
+
+          {/* CCTV View */}
+          {activeTab === 'cctv' && (
+            <div className="space-y-6">
+              <h2 className="font-display text-2xl font-bold">CCTV Surveillance</h2>
+              <CCTVPanel cameras={mockCameras} onCameraSelect={handleCameraSelect} />
+            </div>
+          )}
+
+          {/* Occupants View */}
+          {activeTab === 'occupants' && (
+            <div className="space-y-6">
+              <h2 className="font-display text-2xl font-bold">Occupants Management</h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <StatsCard title="Total Occupants" value={stats.totalOccupants} icon={Users} variant="info" />
+                <StatsCard title="Safe" value={stats.safeOccupants + stats.rescuedOccupants} icon={UserCheck} variant="safe" />
+                <StatsCard title="Stuck" value={stats.stuckOccupants} icon={UserX} variant="danger" />
+                <StatsCard title="Injured" value={stats.injuredOccupants} icon={Shield} variant="warning" />
+              </div>
+              <OccupantsList occupants={occupants} onOccupantSelect={handleOccupantSelect} />
+            </div>
+          )}
+
+          {/* Building Map View */}
+          {activeTab === 'map' && (
+            <div className="space-y-6">
+              <h2 className="font-display text-2xl font-bold">Building Map</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <BuildingMap zones={mockZones} occupants={occupants} onZoneSelect={handleZoneSelect} />
+                <EvacuationProgress stats={stats} />
+              </div>
+            </div>
+          )}
+
+          {/* Controls View */}
+          {activeTab === 'controls' && (
+            <div className="space-y-6">
+              <h2 className="font-display text-2xl font-bold">Building Controls</h2>
+              <ControlPanel controls={controls} onControlToggle={handleControlToggle} />
+            </div>
+          )}
+
+          {/* Alerts View */}
+          {activeTab === 'alerts' && (
+            <div className="space-y-6">
+              <h2 className="font-display text-2xl font-bold">Alert Management</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                <StatsCard title="Active Alerts" value={activeAlerts.length} icon={AlertTriangle} variant={activeAlerts.length > 0 ? 'danger' : 'safe'} />
+                <StatsCard title="Critical" value={activeAlerts.filter(a => a.level === 'critical').length} icon={Flame} variant="danger" />
+                <StatsCard title="Acknowledged" value={alerts.filter(a => a.acknowledged).length} icon={Shield} variant="info" />
+              </div>
+              <AlertsPanel alerts={alerts} onAcknowledge={handleAcknowledgeAlert} />
+            </div>
+          )}
+
+          {/* Rescue Teams View */}
+          {activeTab === 'rescue' && (
+            <div className="space-y-6">
+              <h2 className="font-display text-2xl font-bold">Rescue Teams</h2>
+              <RescueTeamsPanel teams={rescueTeams} onAlertTeam={handleAlertTeam} />
+            </div>
+          )}
+
+          {/* Reports View */}
+          {activeTab === 'reports' && (
+            <div className="space-y-6">
+              <h2 className="font-display text-2xl font-bold">Reports</h2>
+              <div className="p-8 bg-card rounded-lg border border-border text-center">
+                <p className="text-muted-foreground">Report generation feature coming soon.</p>
+              </div>
+            </div>
+          )}
+
+          {/* Settings View */}
+          {activeTab === 'settings' && (
+            <div className="space-y-6">
+              <h2 className="font-display text-2xl font-bold">Settings</h2>
+              <div className="p-8 bg-card rounded-lg border border-border text-center">
+                <p className="text-muted-foreground">System settings will be available here.</p>
+              </div>
+            </div>
+          )}
+
+          {/* Help View */}
+          {activeTab === 'help' && (
+            <div className="space-y-6">
+              <h2 className="font-display text-2xl font-bold">Help & Documentation</h2>
+              <div className="p-8 bg-card rounded-lg border border-border text-center">
+                <p className="text-muted-foreground">Help documentation and support resources.</p>
+              </div>
+            </div>
+          )}
         </main>
       </div>
 
