@@ -11,7 +11,9 @@ import {
   FileText,
   HelpCircle,
   Siren,
-  Activity
+  Activity,
+  Package,
+  Zap
 } from "lucide-react";
 
 interface SidebarProps {
@@ -30,6 +32,8 @@ const navItems = [
   { id: 'controls', label: 'Controls', icon: Sliders },
   { id: 'alerts', label: 'Alerts', icon: Bell },
   { id: 'rescue', label: 'Rescue Teams', icon: Siren },
+  { id: 'supplies', label: 'Supplies', icon: Package },
+  { id: 'circuits', label: 'Circuits', icon: Zap },
 ];
 
 const bottomItems = [

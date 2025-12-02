@@ -100,3 +100,30 @@ export interface EmergencyStats {
   floorsAffected: number;
   evacuationProgress: number;
 }
+
+export interface EmergencySupply {
+  id: string;
+  name: string;
+  type: 'food' | 'water' | 'medical' | 'blankets' | 'flashlights' | 'batteries';
+  totalUnits: number;
+  usedUnits: number;
+  unit: string;
+  daysRemaining: number;
+  location: string;
+  lastRestocked: Date;
+}
+
+export interface CircuitSystem {
+  id: string;
+  name: string;
+  zone: string;
+  floor: number;
+  status: 'healthy' | 'warning' | 'critical' | 'failed';
+  load: number;
+  maxLoad: number;
+  temperature: number;
+  predictedFailure: boolean;
+  failureRisk: number;
+  lastMaintenance: Date;
+  solution?: string;
+}
