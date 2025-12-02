@@ -20,9 +20,12 @@ interface HeaderProps {
   isEmergency: boolean;
   onMenuToggle?: () => void;
   menuOpen?: boolean;
+  onAlertsClick?: () => void;
+  onSettingsClick?: () => void;
+  onUserClick?: () => void;
 }
 
-export function Header({ alertCount, isEmergency, onMenuToggle, menuOpen }: HeaderProps) {
+export function Header({ alertCount, isEmergency, onMenuToggle, menuOpen, onAlertsClick, onSettingsClick, onUserClick }: HeaderProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isOnline, setIsOnline] = useState(true);
 
@@ -128,6 +131,7 @@ export function Header({ alertCount, isEmergency, onMenuToggle, menuOpen }: Head
               variant={alertCount > 0 ? "danger" : "secondary"}
               size="icon"
               className="relative"
+              onClick={onAlertsClick}
             >
               <Bell className="w-5 h-5" />
               {alertCount > 0 && (
@@ -138,12 +142,12 @@ export function Header({ alertCount, isEmergency, onMenuToggle, menuOpen }: Head
             </Button>
 
             {/* User */}
-            <Button variant="secondary" size="icon" className="hidden sm:flex">
+            <Button variant="secondary" size="icon" className="hidden sm:flex" onClick={onUserClick}>
               <User className="w-5 h-5" />
             </Button>
 
             {/* Settings */}
-            <Button variant="secondary" size="icon" className="hidden sm:flex">
+            <Button variant="secondary" size="icon" className="hidden sm:flex" onClick={onSettingsClick}>
               <Settings className="w-5 h-5" />
             </Button>
           </div>
