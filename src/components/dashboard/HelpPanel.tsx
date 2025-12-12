@@ -274,36 +274,6 @@ export function HelpPanel() {
           </div>
         </CardContent>
       </Card>
-
-      {/* Training Resources */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="w-5 h-5 text-info" />
-            Training Resources
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Button variant="secondary" className="h-auto py-4 flex-col gap-2">
-              <FileText className="w-6 h-6 text-info" />
-              <span className="text-sm">User Manual (PDF)</span>
-            </Button>
-            <Button variant="secondary" className="h-auto py-4 flex-col gap-2">
-              <Video className="w-6 h-6 text-info" />
-              <span className="text-sm">Basic Training Video</span>
-            </Button>
-            <Button variant="secondary" className="h-auto py-4 flex-col gap-2">
-              <Shield className="w-6 h-6 text-info" />
-              <span className="text-sm">Emergency Drills Guide</span>
-            </Button>
-            <Button variant="secondary" className="h-auto py-4 flex-col gap-2">
-              <ExternalLink className="w-6 h-6 text-info" />
-              <span className="text-sm">Advanced Configuration</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
