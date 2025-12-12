@@ -11,6 +11,9 @@ import { RescueTeamsPanel } from "@/components/dashboard/RescueTeamsPanel";
 import { EvacuationProgress } from "@/components/dashboard/EvacuationProgress";
 import { SuppliesPanel } from "@/components/dashboard/SuppliesPanel";
 import { CircuitPredictionPanel } from "@/components/dashboard/CircuitPredictionPanel";
+import { ReportsPanel } from "@/components/dashboard/ReportsPanel";
+import { SettingsPanel } from "@/components/dashboard/SettingsPanel";
+import { HelpPanel } from "@/components/dashboard/HelpPanel";
 import { OccupantDetailModal } from "@/components/modals/OccupantDetailModal";
 import { ZoneDetailModal } from "@/components/modals/ZoneDetailModal";
 import { AllOccupantsModal } from "@/components/modals/AllOccupantsModal";
@@ -404,20 +407,18 @@ export default function Dashboard() {
           {/* Reports View */}
           {activeTab === 'reports' && (
             <div className="space-y-6">
-              <h2 className="font-display text-2xl font-bold">Reports</h2>
-              <div className="p-8 bg-card rounded-lg border border-border text-center">
-                <p className="text-muted-foreground">Report generation feature coming soon.</p>
-              </div>
+              <h2 className="font-display text-2xl font-bold">Reports & Documentation</h2>
+              <p className="text-muted-foreground">Generate, download, and schedule emergency reports for compliance and analysis.</p>
+              <ReportsPanel stats={stats} alertCount={activeAlerts.length} />
             </div>
           )}
 
           {/* Settings View */}
           {activeTab === 'settings' && (
             <div className="space-y-6">
-              <h2 className="font-display text-2xl font-bold">Settings</h2>
-              <div className="p-8 bg-card rounded-lg border border-border text-center">
-                <p className="text-muted-foreground">System settings will be available here.</p>
-              </div>
+              <h2 className="font-display text-2xl font-bold">System Settings</h2>
+              <p className="text-muted-foreground">Configure notifications, sensors, GSM module, CCTV, and system preferences.</p>
+              <SettingsPanel />
             </div>
           )}
 
@@ -425,9 +426,8 @@ export default function Dashboard() {
           {activeTab === 'help' && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-bold">Help & Documentation</h2>
-              <div className="p-8 bg-card rounded-lg border border-border text-center">
-                <p className="text-muted-foreground">Help documentation and support resources.</p>
-              </div>
+              <p className="text-muted-foreground">Learn about the SDRRS modules, emergency procedures, and get support.</p>
+              <HelpPanel />
             </div>
           )}
         </main>
