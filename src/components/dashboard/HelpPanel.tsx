@@ -2,7 +2,6 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
   HelpCircle, 
-  BookOpen, 
   Phone, 
   Mail, 
   Video,
@@ -10,85 +9,13 @@ import {
   Shield,
   AlertTriangle,
   Users,
-  Monitor,
-  Radio,
-  Zap,
-  ChevronRight,
-  ExternalLink
+  Download,
+  PlayCircle
 } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { toast } from "sonner";
 
 export function HelpPanel() {
-  const modules = [
-    {
-      id: 'module1',
-      title: 'Module 1: Offline Hardware Layer',
-      icon: Zap,
-      description: 'Life-Safety Guarantee - Works even during power failure',
-      features: [
-        'UPS-powered hardware ensuring 24/7 operation',
-        'Multi-hazard sensors: Fire, Smoke, CO Gas, Overheating, Vibration/Tilt',
-        'BLE Beacon Network for offline indoor geolocation',
-        'Virtual ID Card Device for occupant tracking (T-UID)',
-        'Local SSD for offline 24/7 CCTV storage',
-        'Immediate automated alerts: Siren, Red Lights, Voice Guidance',
-      ],
-    },
-    {
-      id: 'module2',
-      title: 'Module 2: Online Cloud & Admin Command Center',
-      icon: Monitor,
-      description: 'Centralized control and monitoring dashboard',
-      features: [
-        'Admin-only secure login (Role-based access)',
-        'Employee details, health conditions, injury status management',
-        'Dynamic triage calculation for rescue prioritization',
-        'Real-time indoor map visualization with GPS coordinates (Lat/Long)',
-        'Manual override controls: alarms, sprinklers, doors, ventilation',
-        'Live CCTV monitoring across all floors',
-      ],
-    },
-    {
-      id: 'module3',
-      title: 'Module 3: External Emergency & Volunteer Alert System',
-      icon: Radio,
-      description: 'Automatic alerts to government rescue teams',
-      features: [
-        'GSM module sends instant SMS alerts without internet',
-        'Automatic notification to Fire (101), Ambulance (108), Police (100)',
-        'Volunteer pop-up alerts within 2km radius',
-        'Dedicated SIM for reliable SMS transmission',
-        'Works even during network outages',
-      ],
-    },
-    {
-      id: 'module4',
-      title: 'Module 4: Offline Footage Retrieval System',
-      icon: Video,
-      description: 'Continuous recording even during collapse',
-      features: [
-        'Cameras record 24/7 to local SSD storage',
-        'Footage survives building damage due to protected storage',
-        'Local Wi-Fi link between hardware and Admin App',
-        'Secure retrieval of stored CCTV footage',
-        'Helps identify trapped survivors and structural conditions',
-      ],
-    },
-    {
-      id: 'module5',
-      title: 'Module 5: Smart Evacuation & Survival System',
-      icon: Shield,
-      description: 'Dynamic escape routing and survival resources',
-      features: [
-        'LED floor indicators guide safest route dynamically',
-        'Hazard-aware path switching (green = safe, red = danger)',
-        'First-aid and survival packs accessible for 10 days',
-        'Emergency supplies tracking (food, water, medical)',
-        'Automatic casualty assessment using T-UID logs',
-      ],
-    },
-  ];
-
   const faqs = [
     {
       question: 'How do I view all occupants with their exact locations?',
@@ -120,6 +47,30 @@ export function HelpPanel() {
     },
   ];
 
+  const handleDownloadManual = () => {
+    toast.success("Downloading User Manual PDF...", {
+      description: "SDRRS_User_Manual_v2.1.pdf"
+    });
+  };
+
+  const handleWatchVideo = (videoName: string) => {
+    toast.info(`Opening ${videoName}...`, {
+      description: "Video will open in a new window"
+    });
+  };
+
+  const handleDownloadGuide = () => {
+    toast.success("Downloading Emergency Drills Guide...", {
+      description: "Emergency_Drills_Guide_2024.pdf"
+    });
+  };
+
+  const handleOpenConfiguration = () => {
+    toast.info("Opening Advanced Configuration Guide...", {
+      description: "Admin access required for system configuration"
+    });
+  };
+
   return (
     <div className="space-y-6">
       {/* Quick Help */}
@@ -142,54 +93,16 @@ export function HelpPanel() {
               <span>Email Support</span>
               <span className="text-xs text-muted-foreground">support@sdrrs.com</span>
             </Button>
-            <Button variant="secondary" className="h-auto py-4 flex-col gap-2">
+            <Button 
+              variant="secondary" 
+              className="h-auto py-4 flex-col gap-2"
+              onClick={() => handleWatchVideo("Video Tutorials")}
+            >
               <Video className="w-6 h-6 text-info" />
               <span>Video Tutorials</span>
               <span className="text-xs text-muted-foreground">Watch training videos</span>
             </Button>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* System Modules */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-info" />
-            System Modules Documentation
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Accordion type="single" collapsible className="w-full">
-            {modules.map((module) => {
-              const Icon = module.icon;
-              return (
-                <AccordionItem key={module.id} value={module.id}>
-                  <AccordionTrigger className="hover:no-underline">
-                    <div className="flex items-center gap-3 text-left">
-                      <div className="p-2 bg-info/10 rounded-lg">
-                        <Icon className="w-5 h-5 text-info" />
-                      </div>
-                      <div>
-                        <p className="font-medium">{module.title}</p>
-                        <p className="text-xs text-muted-foreground">{module.description}</p>
-                      </div>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <ul className="space-y-2 pl-12">
-                      {module.features.map((feature, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
-                          <ChevronRight className="w-4 h-4 text-info mt-0.5 flex-shrink-0" />
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </AccordionContent>
-                </AccordionItem>
-              );
-            })}
-          </Accordion>
         </CardContent>
       </Card>
 
@@ -271,6 +184,62 @@ export function HelpPanel() {
                 <li>Document lessons learned</li>
               </ol>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Training Resources */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="w-5 h-5 text-info" />
+            Training Resources
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Button 
+              variant="secondary" 
+              className="h-auto py-4 flex-col gap-2"
+              onClick={handleDownloadManual}
+            >
+              <FileText className="w-6 h-6 text-info" />
+              <span className="text-sm font-medium">User Manual</span>
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                <Download className="w-3 h-3" /> PDF Download
+              </span>
+            </Button>
+            <Button 
+              variant="secondary" 
+              className="h-auto py-4 flex-col gap-2"
+              onClick={() => handleWatchVideo("Basic Training")}
+            >
+              <PlayCircle className="w-6 h-6 text-info" />
+              <span className="text-sm font-medium">Basic Training</span>
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                <Video className="w-3 h-3" /> 15 min video
+              </span>
+            </Button>
+            <Button 
+              variant="secondary" 
+              className="h-auto py-4 flex-col gap-2"
+              onClick={handleDownloadGuide}
+            >
+              <Shield className="w-6 h-6 text-info" />
+              <span className="text-sm font-medium">Emergency Drills</span>
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                <Download className="w-3 h-3" /> PDF Guide
+              </span>
+            </Button>
+            <Button 
+              variant="secondary" 
+              className="h-auto py-4 flex-col gap-2"
+              onClick={handleOpenConfiguration}
+            >
+              <FileText className="w-6 h-6 text-info" />
+              <span className="text-sm font-medium">Advanced Config</span>
+              <span className="text-xs text-muted-foreground">Admin Guide</span>
+            </Button>
           </div>
         </CardContent>
       </Card>
