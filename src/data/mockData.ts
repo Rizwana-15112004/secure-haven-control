@@ -11,99 +11,104 @@ import {
   CircuitSystem
 } from '@/types';
 
-// Mock Occupants Data
-export const mockOccupants: Occupant[] = [
-  {
-    id: '1',
-    tempUID: 'TUID-001',
-    name: 'Rajesh Kumar',
-    department: 'Engineering',
-    floor: 3,
-    zone: 'A',
-    location: { lat: 12.9716, lng: 77.5946 },
-    status: 'stuck',
-    healthCondition: 'moderate',
-    preExistingConditions: ['Asthma'],
-    injuryStatus: 'Smoke inhalation',
-    entryTime: new Date('2024-01-15T09:00:00'),
-    lastSeen: new Date(),
-    triageScore: 85,
-    contactNumber: '+91 98765 43210',
-    emergencyContact: '+91 98765 43211',
-  },
-  {
-    id: '2',
-    tempUID: 'TUID-002',
-    name: 'Priya Sharma',
-    department: 'HR',
-    floor: 2,
-    zone: 'B',
-    location: { lat: 12.9720, lng: 77.5950 },
-    status: 'safe',
-    healthCondition: 'healthy',
-    preExistingConditions: [],
-    injuryStatus: 'None',
-    entryTime: new Date('2024-01-15T08:30:00'),
-    lastSeen: new Date(),
-    triageScore: 20,
-    contactNumber: '+91 98765 43212',
-    emergencyContact: '+91 98765 43213',
-  },
-  {
-    id: '3',
-    tempUID: 'TUID-003',
-    name: 'Mohammed Ali',
-    department: 'Security',
-    floor: 4,
-    zone: 'C',
-    location: { lat: 12.9718, lng: 77.5948 },
-    status: 'stuck',
-    healthCondition: 'critical',
-    preExistingConditions: ['Heart condition', 'Diabetes'],
-    injuryStatus: 'Burns on left arm',
-    entryTime: new Date('2024-01-15T07:00:00'),
-    lastSeen: new Date(),
-    triageScore: 95,
-    contactNumber: '+91 98765 43214',
-    emergencyContact: '+91 98765 43215',
-  },
-  {
-    id: '4',
-    tempUID: 'TUID-004',
-    name: 'Sarah Johnson',
-    department: 'Finance',
-    floor: 1,
-    zone: 'A',
-    location: { lat: 12.9714, lng: 77.5944 },
-    status: 'rescued',
-    healthCondition: 'minor',
-    preExistingConditions: [],
-    injuryStatus: 'Minor cuts',
-    entryTime: new Date('2024-01-15T09:15:00'),
-    lastSeen: new Date(),
-    triageScore: 30,
-    contactNumber: '+91 98765 43216',
-    emergencyContact: '+91 98765 43217',
-  },
-  {
-    id: '5',
-    tempUID: 'TUID-005',
-    name: 'Amit Patel',
-    department: 'IT',
-    floor: 3,
-    zone: 'B',
-    location: { lat: 12.9722, lng: 77.5952 },
-    status: 'stuck',
-    healthCondition: 'severe',
-    preExistingConditions: ['Mobility impaired'],
-    injuryStatus: 'Unable to move',
-    entryTime: new Date('2024-01-15T08:45:00'),
-    lastSeen: new Date(),
-    triageScore: 92,
-    contactNumber: '+91 98765 43218',
-    emergencyContact: '+91 98765 43219',
-  },
-];
+// Helper function to generate occupants
+const generateOccupants = (): Occupant[] => {
+  const departments = ['Engineering', 'HR', 'Finance', 'IT', 'Security', 'Admin', 'R&D', 'Marketing', 'Legal', 'Operations'];
+  const zones = ['A', 'B', 'C', 'D'];
+  const conditions = ['Asthma', 'Heart condition', 'Diabetes', 'Hypertension', 'Mobility impaired', 'Pregnant', 'Epilepsy', 'Allergies'];
+  const injuries = ['None', 'Smoke inhalation', 'Minor cuts', 'Burns on arm', 'Leg injury', 'Head injury', 'Bruises', 'Unable to move', 'Breathing difficulty', 'Fracture'];
+  
+  const names = [
+    'Rajesh Kumar', 'Priya Sharma', 'Mohammed Ali', 'Sarah Johnson', 'Amit Patel',
+    'Sneha Reddy', 'Vikram Singh', 'Anita Desai', 'Arjun Nair', 'Kavitha Menon',
+    'Rahul Gupta', 'Deepa Krishnan', 'Suresh Iyer', 'Meena Joshi', 'Karthik Rajan',
+    'Lakshmi Pillai', 'Sanjay Mehta', 'Pooja Agarwal', 'Venkat Rao', 'Divya Kulkarni',
+    'Arun Bhat', 'Swathi Hegde', 'Naveen Shetty', 'Ritu Saxena', 'Prasad Murthy',
+    'Rekha Naidu', 'Ashok Verma', 'Sunita Pandey', 'Manish Tiwari', 'Anjali Bhatt',
+    'Ramesh Choudhary', 'Geeta Thakur', 'Vijay Malhotra', 'Nisha Kapoor', 'Sunil Ahuja',
+    'Parveen Kaur', 'Tarun Bajaj', 'Simran Gill', 'Mohit Khanna', 'Preeti Bansal',
+    'Gaurav Arora', 'Shweta Jain', 'Nitin Garg', 'Aarti Sinha', 'Rohit Dutta',
+    'Vandana Roy', 'Aakash Mittal', 'Bhavna Chauhan', 'Dinesh Yadav', 'Pallavi Mishra',
+    'Harish Goyal', 'Jyoti Rawat', 'Pankaj Saini', 'Madhu Bhatnagar', 'Alok Tandon',
+    'Shilpa Oberoi', 'Rakesh Grover', 'Neetu Chandra', 'Sameer Vohra', 'Kritika Sethi',
+    'Anil Dhawan', 'Sapna Kohli', 'Manoj Chopra', 'Richa Luthra', 'Siddharth Anand',
+    'Neha Suri', 'Vivek Bedi', 'Komal Nagpal', 'Yash Malviya', 'Tanvi Sachdev'
+  ];
+
+  // Status distribution: 52 safe, 13 stuck, 5 rescued (matching mockStats)
+  const statusDistribution: Array<{ status: Occupant['status']; health: Occupant['healthCondition']; count: number }> = [
+    { status: 'safe', health: 'healthy', count: 45 },
+    { status: 'safe', health: 'minor', count: 7 },
+    { status: 'stuck', health: 'moderate', count: 5 },
+    { status: 'stuck', health: 'severe', count: 4 },
+    { status: 'stuck', health: 'critical', count: 4 },
+    { status: 'rescued', health: 'minor', count: 3 },
+    { status: 'rescued', health: 'healthy', count: 2 },
+  ];
+
+  const occupants: Occupant[] = [];
+  let index = 0;
+
+  statusDistribution.forEach(({ status, health, count }) => {
+    for (let i = 0; i < count && index < 70; i++) {
+      const floor = status === 'stuck' ? (Math.random() > 0.5 ? 3 : 4) : Math.floor(Math.random() * 4) + 1;
+      const zone = zones[Math.floor(Math.random() * zones.length)];
+      const hasConditions = Math.random() > 0.7;
+      const preExisting = hasConditions 
+        ? [conditions[Math.floor(Math.random() * conditions.length)]]
+        : [];
+      if (hasConditions && Math.random() > 0.6) {
+        preExisting.push(conditions[Math.floor(Math.random() * conditions.length)]);
+      }
+      
+      const injury = status === 'stuck' || health !== 'healthy' 
+        ? injuries[Math.floor(Math.random() * (injuries.length - 1)) + 1]
+        : 'None';
+
+      // Calculate triage score based on status and health
+      let triageScore: number;
+      if (status === 'stuck' && health === 'critical') {
+        triageScore = 85 + Math.floor(Math.random() * 15);
+      } else if (status === 'stuck' && health === 'severe') {
+        triageScore = 70 + Math.floor(Math.random() * 15);
+      } else if (status === 'stuck') {
+        triageScore = 50 + Math.floor(Math.random() * 20);
+      } else if (health === 'minor') {
+        triageScore = 25 + Math.floor(Math.random() * 15);
+      } else {
+        triageScore = 5 + Math.floor(Math.random() * 20);
+      }
+
+      occupants.push({
+        id: String(index + 1),
+        tempUID: `TUID-${String(index + 1).padStart(3, '0')}`,
+        name: names[index],
+        department: departments[Math.floor(Math.random() * departments.length)],
+        floor,
+        zone,
+        location: { 
+          lat: 12.9710 + (Math.random() * 0.002), 
+          lng: 77.5940 + (Math.random() * 0.002) 
+        },
+        status,
+        healthCondition: health,
+        preExistingConditions: preExisting,
+        injuryStatus: injury,
+        entryTime: new Date(`2024-01-15T0${7 + Math.floor(Math.random() * 3)}:${String(Math.floor(Math.random() * 60)).padStart(2, '0')}:00`),
+        lastSeen: new Date(),
+        triageScore,
+        contactNumber: `+91 ${98760 + index} ${43210 + index}`,
+        emergencyContact: `+91 ${98760 + index} ${43211 + index}`,
+      });
+      index++;
+    }
+  });
+
+  return occupants;
+};
+
+// Mock Occupants Data - 70 occupants
+export const mockOccupants: Occupant[] = generateOccupants();
 
 // Mock Cameras
 export const mockCameras: Camera[] = [

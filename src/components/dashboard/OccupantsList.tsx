@@ -63,9 +63,11 @@ export function OccupantsList({ occupants, onOccupantSelect }: OccupantsListProp
             <Users className="w-5 h-5 text-info" />
             Occupants
           </CardTitle>
-          <span className="text-sm text-muted-foreground">
-            {filteredOccupants.length} / {occupants.length}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              {filteredOccupants.length} / {occupants.length}
+            </span>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col space-y-3">

@@ -104,7 +104,7 @@ export function AllOccupantsModal({
         {/* Occupants Table */}
         <div className="overflow-auto max-h-[60vh] rounded-lg border border-border">
           <table className="w-full text-sm">
-            <thead className="bg-secondary sticky top-0">
+            <thead className="bg-secondary sticky top-0 z-10">
               <tr>
                 <th className="text-left p-3 font-medium">UID</th>
                 <th className="text-left p-3 font-medium">Name</th>
@@ -114,7 +114,12 @@ export function AllOccupantsModal({
                 <th className="text-left p-3 font-medium">Status</th>
                 <th className="text-left p-3 font-medium">Triage</th>
                 <th className="text-left p-3 font-medium">Health</th>
+                <th className="text-left p-3 font-medium">Pre-existing Conditions</th>
+                <th className="text-left p-3 font-medium">Injury</th>
                 <th className="text-left p-3 font-medium">Contact</th>
+                <th className="text-left p-3 font-medium">Emergency Contact</th>
+                <th className="text-left p-3 font-medium">Entry Time</th>
+                <th className="text-left p-3 font-medium">Last Seen</th>
                 <th className="text-left p-3 font-medium">Actions</th>
               </tr>
             </thead>
@@ -129,17 +134,17 @@ export function AllOccupantsModal({
                   onClick={() => onSelectOccupant(occupant)}
                 >
                   <td className="p-3 font-mono text-xs">{occupant.tempUID}</td>
-                  <td className="p-3 font-medium">{occupant.name}</td>
-                  <td className="p-3 text-muted-foreground">{occupant.department}</td>
+                  <td className="p-3 font-medium whitespace-nowrap">{occupant.name}</td>
+                  <td className="p-3 text-muted-foreground whitespace-nowrap">{occupant.department}</td>
                   <td className="p-3">
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1 whitespace-nowrap">
                       <MapPin className="w-3 h-3 text-info" />
                       F{occupant.floor} • Zone {occupant.zone}
                     </span>
                   </td>
                   <td className="p-3">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs bg-secondary px-2 py-1 rounded">
+                      <span className="font-mono text-xs bg-secondary px-2 py-1 rounded whitespace-nowrap">
                         {occupant.location.lat.toFixed(6)}, {occupant.location.lng.toFixed(6)}
                       </span>
                       <button
@@ -166,7 +171,7 @@ export function AllOccupantsModal({
                   </td>
                   <td className="p-3">
                     <span className={cn(
-                      "px-2 py-1 rounded text-xs font-bold uppercase",
+                      "px-2 py-1 rounded text-xs font-bold uppercase whitespace-nowrap",
                       getStatusStyle(occupant.status)
                     )}>
                       {occupant.status}
@@ -182,31 +187,58 @@ export function AllOccupantsModal({
                     </span>
                   </td>
                   <td className="p-3">
-                    <div className="flex items-center gap-1">
-                      {occupant.preExistingConditions.length > 0 && (
-                        <Heart className="w-3 h-3 text-warning" />
-                      )}
-                      <span className={cn(
-                        "capitalize text-xs",
-                        occupant.healthCondition === 'critical' ? "text-danger" :
-                        occupant.healthCondition === 'severe' ? "text-warning" : "text-muted-foreground"
-                      )}>
-                        {occupant.healthCondition}
-                      </span>
-                    </div>
-                    {occupant.injuryStatus !== 'None' && (
-                      <p className="text-xs text-danger mt-1">{occupant.injuryStatus}</p>
+                    <span className={cn(
+                      "capitalize text-xs whitespace-nowrap",
+                      occupant.healthCondition === 'critical' ? "text-danger" :
+                      occupant.healthCondition === 'severe' ? "text-warning" : "text-muted-foreground"
+                    )}>
+                      {occupant.healthCondition}
+                    </span>
+                  </td>
+                  <td className="p-3">
+                    {occupant.preExistingConditions.length > 0 ? (
+                      <div className="flex items-center gap-1">
+                        <Heart className="w-3 h-3 text-warning flex-shrink-0" />
+                        <span className="text-xs text-warning whitespace-nowrap">
+                          {occupant.preExistingConditions.join(', ')}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">None</span>
+                    )}
+                  </td>
+                  <td className="p-3">
+                    {occupant.injuryStatus !== 'None' ? (
+                      <span className="text-xs text-danger whitespace-nowrap">{occupant.injuryStatus}</span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">None</span>
                     )}
                   </td>
                   <td className="p-3">
                     <a 
                       href={`tel:${occupant.contactNumber}`}
                       onClick={(e) => e.stopPropagation()}
-                      className="flex items-center gap-1 text-info hover:underline"
+                      className="flex items-center gap-1 text-info hover:underline whitespace-nowrap"
                     >
                       <Phone className="w-3 h-3" />
                       <span className="text-xs">{occupant.contactNumber}</span>
                     </a>
+                  </td>
+                  <td className="p-3">
+                    <a 
+                      href={`tel:${occupant.emergencyContact}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center gap-1 text-warning hover:underline whitespace-nowrap"
+                    >
+                      <Phone className="w-3 h-3" />
+                      <span className="text-xs">{occupant.emergencyContact}</span>
+                    </a>
+                  </td>
+                  <td className="p-3 text-xs text-muted-foreground whitespace-nowrap">
+                    {occupant.entryTime.toLocaleTimeString()}
+                  </td>
+                  <td className="p-3 text-xs text-muted-foreground whitespace-nowrap">
+                    {occupant.lastSeen.toLocaleTimeString()}
                   </td>
                   <td className="p-3">
                     <Button
