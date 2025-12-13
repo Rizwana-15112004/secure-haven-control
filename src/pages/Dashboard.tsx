@@ -4,7 +4,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { AlertsPanel } from "@/components/dashboard/AlertsPanel";
 import { BuildingMap } from "@/components/dashboard/BuildingMap";
-import { CCTVPanel } from "@/components/dashboard/CCTVPanel";
+import { CCTVAccessControl } from "@/components/dashboard/CCTVAccessControl";
 import { OccupantsList } from "@/components/dashboard/OccupantsList";
 import { ControlPanel } from "@/components/dashboard/ControlPanel";
 import { RescueTeamsPanel } from "@/components/dashboard/RescueTeamsPanel";
@@ -233,10 +233,12 @@ export default function Dashboard() {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
                 {/* Left Column */}
                 <div className="lg:col-span-2 space-y-4 md:space-y-6">
-                  {/* CCTV */}
-                  <CCTVPanel 
+                  {/* CCTV with Access Control */}
+                  <CCTVAccessControl 
                     cameras={mockCameras} 
                     onCameraSelect={handleCameraSelect}
+                    isEmergency={isEmergency}
+                    userRole="head"
                   />
 
                   {/* Building Map + Alerts */}
@@ -321,7 +323,12 @@ export default function Dashboard() {
           {activeTab === 'cctv' && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-bold">CCTV Surveillance</h2>
-              <CCTVPanel cameras={mockCameras} onCameraSelect={handleCameraSelect} />
+              <CCTVAccessControl 
+                cameras={mockCameras} 
+                onCameraSelect={handleCameraSelect}
+                isEmergency={isEmergency}
+                userRole="head"
+              />
             </div>
           )}
 
