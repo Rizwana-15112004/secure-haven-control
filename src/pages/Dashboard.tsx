@@ -17,6 +17,7 @@ import { HelpPanel } from "@/components/dashboard/HelpPanel";
 import { OccupantDetailModal } from "@/components/modals/OccupantDetailModal";
 import { ZoneDetailModal } from "@/components/modals/ZoneDetailModal";
 import { AllOccupantsModal } from "@/components/modals/AllOccupantsModal";
+import { AddOccupantModal } from "@/components/modals/AddOccupantModal";
 import { Button } from "@/components/ui/button";
 import { 
   mockOccupants, 
@@ -37,7 +38,8 @@ import {
   UserX,
   Shield,
   Flame,
-  Eye
+  Eye,
+  UserPlus
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -58,6 +60,7 @@ export default function Dashboard() {
   const [occupantModalOpen, setOccupantModalOpen] = useState(false);
   const [zoneModalOpen, setZoneModalOpen] = useState(false);
   const [allOccupantsModalOpen, setAllOccupantsModalOpen] = useState(false);
+  const [addOccupantModalOpen, setAddOccupantModalOpen] = useState(false);
 
   const activeAlerts = alerts.filter(a => a.isActive);
   const isEmergency = activeAlerts.some(a => a.level === 'critical' || a.level === 'danger');
@@ -119,6 +122,10 @@ export default function Dashboard() {
     setCircuits(prev => prev.map(c => 
       c.id === id ? { ...c, status: 'warning' as const, failureRisk: Math.max(c.failureRisk - 30, 10) } : c
     ));
+  };
+
+  const handleAddOccupant = (newOccupant: Occupant) => {
+    setOccupants(prev => [...prev, newOccupant]);
   };
 
   // Header button handlers
@@ -335,12 +342,18 @@ export default function Dashboard() {
           {/* Occupants View */}
           {activeTab === 'occupants' && (
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between flex-wrap gap-3">
                 <h2 className="font-display text-2xl font-bold">Occupants Management</h2>
-                <Button variant="info" onClick={() => setAllOccupantsModalOpen(true)}>
-                  <Eye className="w-4 h-4 mr-2" />
-                  View All Occupants with Coordinates
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="default" onClick={() => setAddOccupantModalOpen(true)}>
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Add Occupant
+                  </Button>
+                  <Button variant="info" onClick={() => setAllOccupantsModalOpen(true)}>
+                    <Eye className="w-4 h-4 mr-2" />
+                    View All with Coordinates
+                  </Button>
+                </div>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <StatsCard title="Total Occupants" value={stats.totalOccupants} icon={Users} variant="info" />
@@ -460,6 +473,12 @@ export default function Dashboard() {
           setAllOccupantsModalOpen(false);
           handleOccupantSelect(occupant);
         }}
+      />
+      <AddOccupantModal
+        isOpen={addOccupantModalOpen}
+        onClose={() => setAddOccupantModalOpen(false)}
+        onAddOccupant={handleAddOccupant}
+        existingCount={occupants.length}
       />
     </div>
   );
