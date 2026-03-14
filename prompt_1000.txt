@@ -1,0 +1,7 @@
+Create a highly realistic, cinematic 4K video of the Secure Disaster Response and Rescue System (SDRRS). A modern command center glows with blue and red LED accents. A large screen displays the dark-mode SDRRS interface with a sharp shield logo.
+
+Live statistics pulse: 'Total Occupants: 108' (blue), 'Safe: 95' (green), 'Injured: 13' (yellow). A glassmorphism cursor fluidly clicks through analytics, triggering smooth UI transitions. The view shifts to 'Building Map'. A 2D floor plan appears; danger zones glow pulsating red, safe zones steady green. The cursor hovers over a room, expanding a sleek pop-up with GPS coordinates and triage scores. 
+
+On the 'Controls' panel, the cursor clicks 'Fire Emergency'. An urgent red alert flashes, and ambient lighting shifts to deep cinematic red. 
+
+Finally, the cursor clicks 'Download All (PDF)'. A 3D branded, multi-page data table slides into view. The camera pulls back, fading to dark blue with crisp white text: 'SDRRS: Total Control'.             

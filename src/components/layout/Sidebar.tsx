@@ -1,11 +1,12 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { 
-  LayoutDashboard, 
-  Video, 
-  Users, 
-  Map, 
-  Settings as SettingsIcon, 
+import { useAuth, Role } from "@/contexts/AuthContext";
+import {
+  LayoutDashboard,
+  Video,
+  Users,
+  Map,
+  Settings as SettingsIcon,
   Bell,
   Sliders,
   FileText,
@@ -24,35 +25,40 @@ interface SidebarProps {
 }
 
 const navItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'monitoring', label: 'Monitoring', icon: Activity },
-  { id: 'cctv', label: 'CCTV', icon: Video },
-  { id: 'occupants', label: 'Occupants', icon: Users },
-  { id: 'map', label: 'Building Map', icon: Map },
-  { id: 'controls', label: 'Controls', icon: Sliders },
-  { id: 'alerts', label: 'Alerts', icon: Bell },
-  { id: 'rescue', label: 'Rescue Teams', icon: Siren },
-  { id: 'supplies', label: 'Supplies', icon: Package },
-  { id: 'circuits', label: 'Circuits', icon: Zap },
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['admin', 'staff'] },
+  { id: 'monitoring', label: 'Monitoring', icon: Activity, roles: ['admin', 'staff'] },
+  { id: 'cctv', label: 'CCTV', icon: Video, roles: ['admin'] },
+  { id: 'occupants', label: 'Occupants', icon: Users, roles: ['admin'] },
+  { id: 'map', label: 'Building Map', icon: Map, roles: ['admin'] },
+  { id: 'controls', label: 'Controls', icon: Sliders, roles: ['admin'] },
+  { id: 'alerts', label: 'Alerts', icon: Bell, roles: ['admin'] },
+  { id: 'rescue', label: 'Rescue Teams', icon: Siren, roles: ['admin'] },
+  { id: 'supplies', label: 'Supplies', icon: Package, roles: ['admin'] },
+  { id: 'circuits', label: 'Circuits', icon: Zap, roles: ['admin'] },
 ];
 
 const bottomItems = [
-  { id: 'reports', label: 'Reports', icon: FileText },
-  { id: 'settings', label: 'Settings', icon: SettingsIcon },
-  { id: 'help', label: 'Help', icon: HelpCircle },
+  { id: 'reports', label: 'Reports', icon: FileText, roles: ['admin'] },
+  { id: 'settings', label: 'Settings', icon: SettingsIcon, roles: ['admin', 'staff'] },
+  { id: 'help', label: 'Help', icon: HelpCircle, roles: ['admin', 'staff'] },
 ];
 
 export function Sidebar({ activeTab, onTabChange, isOpen, onClose }: SidebarProps) {
+  const { role } = useAuth();
+  
   const handleClick = (id: string) => {
     onTabChange(id);
     onClose?.();
   };
 
+  const visibleNavItems = navItems.filter(item => item.roles.includes(role as Role));
+  const visibleBottomItems = bottomItems.filter(item => item.roles.includes(role as Role));
+
   return (
     <>
       {/* Mobile Overlay */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden"
           onClick={onClose}
         />
@@ -60,14 +66,14 @@ export function Sidebar({ activeTab, onTabChange, isOpen, onClose }: SidebarProp
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed left-0 top-16 bottom-0 w-64 bg-card border-r border-border z-40 transition-transform duration-300",
-        "lg:translate-x-0",
+        "fixed left-0 top-16 bottom-0 w-64 bg-card border-r border-border z-50 transition-transform duration-300 overflow-y-auto",
+        "lg:translate-x-0 lg:z-40",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex flex-col h-full p-4">
           {/* Main Nav */}
           <nav className="space-y-1 flex-1">
-            {navItems.map((item) => {
+            {visibleNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
               return (
@@ -89,7 +95,7 @@ export function Sidebar({ activeTab, onTabChange, isOpen, onClose }: SidebarProp
 
           {/* Bottom Nav */}
           <div className="border-t border-border pt-4 space-y-1">
-            {bottomItems.map((item) => {
+            {visibleBottomItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
               return (

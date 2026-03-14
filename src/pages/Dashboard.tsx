@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { StatsCard } from "@/components/dashboard/StatsCard";
@@ -14,6 +15,10 @@ import { CircuitPredictionPanel } from "@/components/dashboard/CircuitPrediction
 import { ReportsPanel } from "@/components/dashboard/ReportsPanel";
 import { SettingsPanel } from "@/components/dashboard/SettingsPanel";
 import { HelpPanel } from "@/components/dashboard/HelpPanel";
+import { StaffHelpPanel } from "@/components/dashboard/StaffHelpPanel";
+import { EmergencyAlertPanel } from "@/components/dashboard/EmergencyAlertPanel";
+import { useEmergencyAlerts } from "@/contexts/EmergencyAlertContext";
+import { NearbyVolunteerAlert } from "@/components/dashboard/NearbyVolunteerAlert";
 import { OccupantDetailModal } from "@/components/modals/OccupantDetailModal";
 import { ZoneDetailModal } from "@/components/modals/ZoneDetailModal";
 import { AllOccupantsModal } from "@/components/modals/AllOccupantsModal";
@@ -42,9 +47,13 @@ import {
 import { toast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
+  const { role } = useAuth();
+  const { unreadCount: staffAlertCount } = useEmergencyAlerts();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [menuOpen, setMenuOpen] = useState(false);
   
+  const isAdmin = role === 'admin';
+
   // Data states
   const [occupants, setOccupants] = useState(mockOccupants);
   const [alerts, setAlerts] = useState(mockAlerts);
@@ -103,6 +112,15 @@ export default function Dashboard() {
     setOccupantModalOpen(true);
   };
 
+  const handleOccupantNavigate = (occupant: Occupant) => {
+    setOccupantModalOpen(false);
+    setActiveTab('map');
+    toast({ 
+      title: `Navigating to ${occupant.name}`, 
+      description: `Floor ${occupant.floor}, Zone ${occupant.zone}` 
+    });
+  };
+
   const handleZoneSelect = (zone: BuildingZone) => {
     setSelectedZone(zone);
     setZoneModalOpen(true);
@@ -125,7 +143,7 @@ export default function Dashboard() {
   const handleAlertsClick = () => setActiveTab('alerts');
   const handleSettingsClick = () => setActiveTab('settings');
   const handleUserClick = () => {
-    toast({ title: "User Profile", description: "Safety Team Admin - Active Session" });
+    toast({ title: "User Profile", description: `${role === 'admin' ? "Safety Team Admin" : "Staff Member"} - Active Session` });
   };
 
   // Calculate real stats from occupants
@@ -149,13 +167,12 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background">
       <Header 
-        alertCount={activeAlerts.length} 
-        isEmergency={isEmergency}
+        alertCount={activeAlerts.length + staffAlertCount} 
+        isEmergency={isEmergency || staffAlertCount > 0}
         onMenuToggle={() => setMenuOpen(!menuOpen)}
         menuOpen={menuOpen}
         onAlertsClick={handleAlertsClick}
         onSettingsClick={handleSettingsClick}
-        onUserClick={handleUserClick}
       />
       
       <div className="flex">
@@ -168,7 +185,7 @@ export default function Dashboard() {
         
         <main className="flex-1 lg:ml-64 p-4 md:p-6">
           {/* Emergency Banner */}
-          {isEmergency && (
+          {isEmergency && isAdmin && (
             <div className="mb-6 p-4 bg-danger/10 border-2 border-danger rounded-lg animate-pulse">
               <div className="flex items-center gap-3">
                 <Flame className="w-6 h-6 text-danger" />
@@ -234,24 +251,32 @@ export default function Dashboard() {
                 {/* Left Column */}
                 <div className="lg:col-span-2 space-y-4 md:space-y-6">
                   {/* CCTV with Access Control */}
-                  <CCTVAccessControl 
-                    cameras={mockCameras} 
-                    onCameraSelect={handleCameraSelect}
-                    isEmergency={isEmergency}
-                    userRole="head"
-                  />
+                  {isAdmin && (
+                    <CCTVAccessControl 
+                      cameras={mockCameras} 
+                      onCameraSelect={handleCameraSelect}
+                      isEmergency={isEmergency}
+                      userRole="head"
+                    />
+                  )}
 
                   {/* Building Map + Alerts */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className={`grid grid-cols-1 ${isAdmin ? 'md:grid-cols-2' : ''} gap-4`}>
                     <BuildingMap 
                       zones={mockZones} 
                       occupants={occupants}
                       onZoneSelect={handleZoneSelect}
                     />
-                    <AlertsPanel 
-                      alerts={alerts} 
-                      onAcknowledge={handleAcknowledgeAlert}
-                    />
+                  {/* Alerts Panel */}
+                    {isAdmin && (
+                      <div className="space-y-4">
+                        <EmergencyAlertPanel />
+                        <AlertsPanel 
+                          alerts={alerts} 
+                          onAcknowledge={handleAcknowledgeAlert}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -266,39 +291,44 @@ export default function Dashboard() {
                       occupants={occupants}
                       onOccupantSelect={handleOccupantSelect}
                     />
-                    <Button 
-                      variant="info" 
-                      size="sm" 
-                      className="absolute top-3 right-3"
-                      onClick={() => setAllOccupantsModalOpen(true)}
-                    >
-                      <Eye className="w-4 h-4 mr-1" />
-                      View All
-                    </Button>
+                    {isAdmin && (
+                      <Button 
+                        variant="info" 
+                        size="sm" 
+                        className="absolute top-3 right-3"
+                        onClick={() => setAllOccupantsModalOpen(true)}
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        View All
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
 
-              {/* Bottom Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-6">
-                <ControlPanel 
-                  controls={controls}
-                  onControlToggle={handleControlToggle}
-                />
-                <RescueTeamsPanel 
-                  teams={rescueTeams}
-                  onAlertTeam={handleAlertTeam}
-                />
-              </div>
+              {/* Secure Panels Row */}
+              {isAdmin && (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-6">
+                    <ControlPanel 
+                      controls={controls}
+                      onControlToggle={handleControlToggle}
+                    />
+                    <RescueTeamsPanel 
+                      teams={rescueTeams}
+                      onAlertTeam={handleAlertTeam}
+                    />
+                  </div>
 
-              {/* Supplies & Circuits Row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-6">
-                <SuppliesPanel supplies={mockSupplies} />
-                <CircuitPredictionPanel 
-                  circuits={circuits}
-                  onRepairCircuit={handleRepairCircuit}
-                />
-              </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-6">
+                    <SuppliesPanel supplies={mockSupplies} />
+                    <CircuitPredictionPanel 
+                      circuits={circuits}
+                      onRepairCircuit={handleRepairCircuit}
+                    />
+                  </div>
+                </>
+              )}
             </>
           )}
 
@@ -314,13 +344,13 @@ export default function Dashboard() {
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <AlertsPanel alerts={alerts} onAcknowledge={handleAcknowledgeAlert} />
-                <CircuitPredictionPanel circuits={circuits} onRepairCircuit={handleRepairCircuit} />
+                {isAdmin && <CircuitPredictionPanel circuits={circuits} onRepairCircuit={handleRepairCircuit} />}
               </div>
             </div>
           )}
 
           {/* CCTV View */}
-          {activeTab === 'cctv' && (
+          {activeTab === 'cctv' && isAdmin && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-bold">CCTV Surveillance</h2>
               <CCTVAccessControl 
@@ -333,7 +363,7 @@ export default function Dashboard() {
           )}
 
           {/* Occupants View */}
-          {activeTab === 'occupants' && (
+          {activeTab === 'occupants' && isAdmin && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="font-display text-2xl font-bold">Occupants Management</h2>
@@ -353,7 +383,7 @@ export default function Dashboard() {
           )}
 
           {/* Building Map View */}
-          {activeTab === 'map' && (
+          {activeTab === 'map' && isAdmin && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-bold">Building Map</h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -364,7 +394,7 @@ export default function Dashboard() {
           )}
 
           {/* Controls View */}
-          {activeTab === 'controls' && (
+          {activeTab === 'controls' && isAdmin && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-bold">Building Controls</h2>
               <p className="text-muted-foreground">Manually control all building systems with the buttons below.</p>
@@ -373,9 +403,10 @@ export default function Dashboard() {
           )}
 
           {/* Alerts View */}
-          {activeTab === 'alerts' && (
+          {activeTab === 'alerts' && isAdmin && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-bold">Alert Management</h2>
+              <EmergencyAlertPanel />
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
                 <StatsCard title="Active Alerts" value={activeAlerts.length} icon={AlertTriangle} variant={activeAlerts.length > 0 ? 'danger' : 'safe'} />
                 <StatsCard title="Critical" value={activeAlerts.filter(a => a.level === 'critical').length} icon={Flame} variant="danger" />
@@ -386,15 +417,16 @@ export default function Dashboard() {
           )}
 
           {/* Rescue Teams View */}
-          {activeTab === 'rescue' && (
+          {activeTab === 'rescue' && isAdmin && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-bold">Rescue Teams</h2>
+              <NearbyVolunteerAlert />
               <RescueTeamsPanel teams={rescueTeams} onAlertTeam={handleAlertTeam} />
             </div>
           )}
 
           {/* Supplies View */}
-          {activeTab === 'supplies' && (
+          {activeTab === 'supplies' && isAdmin && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-bold">Emergency Supplies</h2>
               <p className="text-muted-foreground">Track food, water, and essential supplies for stuck occupants (10-day reserve).</p>
@@ -403,7 +435,7 @@ export default function Dashboard() {
           )}
 
           {/* Circuits View */}
-          {activeTab === 'circuits' && (
+          {activeTab === 'circuits' && isAdmin && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-bold">Circuit Failure Prediction</h2>
               <p className="text-muted-foreground">Monitor electrical systems and get AI-powered failure predictions with solutions.</p>
@@ -412,7 +444,7 @@ export default function Dashboard() {
           )}
 
           {/* Reports View */}
-          {activeTab === 'reports' && (
+          {activeTab === 'reports' && isAdmin && (
             <div className="space-y-6">
               <h2 className="font-display text-2xl font-bold">Reports & Documentation</h2>
               <p className="text-muted-foreground">Generate, download, and schedule emergency reports for compliance and analysis.</p>
@@ -432,9 +464,15 @@ export default function Dashboard() {
           {/* Help View */}
           {activeTab === 'help' && (
             <div className="space-y-6">
-              <h2 className="font-display text-2xl font-bold">Help & Documentation</h2>
-              <p className="text-muted-foreground">Learn about the SDRRS modules, emergency procedures, and get support.</p>
-              <HelpPanel />
+              <h2 className="font-display text-2xl font-bold">
+                {isAdmin ? 'Help & Documentation' : 'Staff Safety Guide'}
+              </h2>
+              <p className="text-muted-foreground">
+                {isAdmin
+                  ? 'Learn about the SDRRS modules, emergency procedures, and get support.'
+                  : 'Your guide to emergency procedures, evacuation routes, and how to get help fast.'}
+              </p>
+              {isAdmin ? <HelpPanel /> : <StaffHelpPanel />}
             </div>
           )}
         </main>
@@ -446,6 +484,7 @@ export default function Dashboard() {
         open={occupantModalOpen}
         onClose={() => setOccupantModalOpen(false)}
         onMarkRescued={handleMarkRescued}
+        onNavigate={handleOccupantNavigate}
       />
       <ZoneDetailModal
         zone={selectedZone}

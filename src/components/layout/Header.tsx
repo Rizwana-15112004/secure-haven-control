@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { 
   Shield, 
   Bell, 
@@ -12,7 +18,8 @@ import {
   Battery,
   AlertTriangle,
   Menu,
-  X
+  X,
+  LogOut
 } from "lucide-react";
 
 interface HeaderProps {
@@ -25,9 +32,11 @@ interface HeaderProps {
   onUserClick?: () => void;
 }
 
-export function Header({ alertCount, isEmergency, onMenuToggle, menuOpen, onAlertsClick, onSettingsClick, onUserClick }: HeaderProps) {
+export function Header({ alertCount, isEmergency, onMenuToggle, menuOpen, onAlertsClick, onSettingsClick }: HeaderProps) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [isOnline, setIsOnline] = useState(true);
+  const { role, logout } = useAuth();
+  const [popoverOpen, setPopoverOpen] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -44,6 +53,11 @@ export function Header({ alertCount, isEmergency, onMenuToggle, menuOpen, onAler
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
+
+  const handleLogout = () => {
+    setPopoverOpen(false);
+    logout();
+  };
 
   return (
     <header className={cn(
@@ -127,24 +141,44 @@ export function Header({ alertCount, isEmergency, onMenuToggle, menuOpen, onAler
             </div>
 
             {/* Alerts */}
-            <Button
-              variant={alertCount > 0 ? "danger" : "secondary"}
-              size="icon"
-              className="relative"
-              onClick={onAlertsClick}
-            >
-              <Bell className="w-5 h-5" />
-              {alertCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-danger text-primary-foreground text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
-                  {alertCount}
-                </span>
-              )}
-            </Button>
+            {role === 'admin' && (
+              <Button
+                variant={alertCount > 0 ? "danger" : "secondary"}
+                size="icon"
+                className="relative"
+                onClick={onAlertsClick}
+              >
+                <Bell className="w-5 h-5" />
+                {alertCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-danger text-primary-foreground text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                    {alertCount}
+                  </span>
+                )}
+              </Button>
+            )}
 
-            {/* User */}
-            <Button variant="secondary" size="icon" className="hidden sm:flex" onClick={onUserClick}>
-              <User className="w-5 h-5" />
-            </Button>
+            {/* User Profile / Logout Popover */}
+            <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="secondary" size="icon" className="hidden sm:flex">
+                  <User className="w-5 h-5" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-56 p-2" align="end">
+                <div className="flex flex-col space-y-2 mb-2 p-2 border-b">
+                  <p className="text-sm font-medium leading-none capitalize">{role} Account</p>
+                  <p className="text-xs text-muted-foreground">Active Session</p>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-danger hover:text-danger hover:bg-danger/10"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </Button>
+              </PopoverContent>
+            </Popover>
 
             {/* Settings */}
             <Button variant="secondary" size="icon" className="hidden sm:flex" onClick={onSettingsClick}>

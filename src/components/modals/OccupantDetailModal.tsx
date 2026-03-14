@@ -24,13 +24,15 @@ interface OccupantDetailModalProps {
   open: boolean;
   onClose: () => void;
   onMarkRescued: (id: string) => void;
+  onNavigate?: (occupant: Occupant) => void;
 }
 
 export function OccupantDetailModal({ 
   occupant, 
   open, 
   onClose,
-  onMarkRescued 
+  onMarkRescued,
+  onNavigate
 }: OccupantDetailModalProps) {
   if (!occupant) return null;
 
@@ -43,6 +45,8 @@ export function OccupantDetailModal({
       default: return 'text-info bg-info/20';
     }
   };
+// ... skipping to the bottom rendering part ...
+// This instruction specifically targets lines 22-45 then 196-204 to do a multi block replacement, oops wait I can't do that with replace_file_content. I'll just multi replace next if this fails.
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -193,7 +197,11 @@ export function OccupantDetailModal({
                 <UserCheck className="w-4 h-4 mr-2" />
                 Mark as Rescued
               </Button>
-              <Button variant="info" className="flex-1">
+              <Button 
+                variant="info" 
+                className="flex-1"
+                onClick={() => onNavigate?.(occupant)}
+              >
                 <Navigation className="w-4 h-4 mr-2" />
                 Navigate
               </Button>

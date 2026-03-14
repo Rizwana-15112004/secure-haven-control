@@ -1,0 +1,11 @@
+Create a highly realistic, cinematic 4K video demonstrating the Secure Disaster Response and Rescue System (SDRRS). The scene opens in a modern, sophisticated command center dimly lit with glowing blue and red LED accents. At the center is a sleek, large dashboard screen displaying the SDRRS interface. The typography is crisp and modern, and the branding features a sharp, authoritative shield logo.
+
+The camera zooms smoothly onto the dark-mode software interface. Live, dynamic statistics pulse on the screen: 'Total Occupants: 108' in bright blue, 'Safe: 95' in vibrant green, and 'Injured: 13' in flashing warning yellow. A sophisticated glassmorphism cursor fluidly clicks through various analytics panels, triggering seamless UI transitions with subtle, futuristic micro-animations.
+
+The view transitions to the 'Building Map' tab. A detailed 2D floor plan appears, visualizing the entire facility. Specific zones glow with a pulsating red aura to indicate 'Danger', while safe zones are bathed in a calm, steady green light. The cursor hovers over a specific room, and a sleek pop-up smoothly expands, displaying detailed GPS coordinates and the real-time health triage score of an occupant trapped inside.
+
+Next, the camera focuses tightly on the 'Controls' panel within the application, showing modern toggle switches for 'Building Alarm', 'Sprinklers', and 'Emergency Power'. The cursor purposefully clicks the 'Fire Emergency' toggle. Instantly, the digital interface reacts: a subtle but urgent red alert indicator flashes across the top banner, and the surrounding ambient lighting in the physical command center flawlessly shifts to a deep, cinematic emergency red.
+
+The cursor expertly navigates to a 'Reports' sidebar tab and clicks a 'Download All (PDF)' button. A smooth 3D animation shows a branded, professional, multi-page data table sliding into view, complete with dark-blue corporate headers, SDRRS branding, and perfectly structured data grids.
+
+As the demonstration concludes, the camera slowly pulls back from the

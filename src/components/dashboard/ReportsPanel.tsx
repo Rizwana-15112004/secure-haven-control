@@ -1,5 +1,6 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { setupSDRRSDoc, addFooter, drawTable } from "@/lib/pdfHelper";
 import { 
   FileText, 
   Download, 
@@ -86,8 +87,80 @@ export function ReportsPanel({ stats, alertCount }: ReportsPanelProps) {
 
   const handleDownload = (reportId: string, reportName: string) => {
     toast({
+      title: "Generating Report...",
+      description: `Preparing ${reportName} for download.`,
+    });
+
+    const doc = setupSDRRSDoc(
+      reportId === 'all' ? "Complete Report Package" : reportName
+    );
+    
+    let currentY = 90;
+    
+    if (reportId === 'all') {
+      reports.forEach((report, index) => {
+        if (index > 0) {
+          doc.addPage();
+          currentY = 40; // Reset Y for new page (below header)
+          
+          // Add header strip on subsequent pages
+          doc.setFillColor(15, 23, 42);
+          doc.rect(0, 0, doc.internal.pageSize.getWidth(), 20, 'F');
+        }
+        
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(16);
+        doc.text(report.name, 20, currentY);
+        currentY += 8;
+        
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.text(report.description, 20, currentY);
+        currentY += 15;
+        
+        // Convert text data points into table rows
+        const tableBody = report.data.map(item => {
+          const [key, ...rest] = item.split(': ');
+          return [key, rest.length > 0 ? rest.join(': ') : 'Active'];
+        });
+
+        currentY = drawTable(doc, currentY, {
+          head: [['Metric', 'Value/Status']],
+          body: tableBody,
+          theme: 'grid'
+        });
+      });
+      
+      addFooter(doc);
+      doc.save("SDRRS_Complete_Report_Package.pdf");
+
+    } else {
+      const report = reports.find(r => r.id === reportId);
+      if (!report) return;
+      
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+      doc.text(report.description, 20, currentY);
+      currentY += 15;
+      
+      const tableBody = report.data.map(item => {
+        const [key, ...rest] = item.split(': ');
+        return [key, rest.length > 0 ? rest.join(': ') : 'Active'];
+      });
+
+      drawTable(doc, currentY, {
+        head: [['Metric', 'Value/Status']],
+        body: tableBody,
+        theme: 'grid'
+      });
+      
+      addFooter(doc);
+      doc.save(`${report.name.replace(/\s+/g, '_')}.pdf`);
+    }
+
+    toast({
       title: "Report Downloaded",
-      description: `${reportName} has been downloaded as PDF.`,
+      description: `${reportName} has been downloaded securely.`,
     });
   };
 
