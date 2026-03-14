@@ -20,7 +20,8 @@ export default function Login() {
 
     try {
       const ip = localStorage.getItem('serverIP') || window.location.hostname;
-      const response = await fetch(`http://${ip}:8080/api/auth/login`, {
+      const protocol = window.location.protocol;
+      const response = await fetch(`${protocol}//${ip}:8080/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -126,8 +127,8 @@ export default function Login() {
             <div className="bg-secondary/50 rounded-lg p-4 text-sm text-secondary-foreground">
               <p className="font-semibold mb-1">Demo Credentials:</p>
               <ul className="list-disc list-inside space-y-1 text-xs">
-                <li>Admin: <code>admin</code> / <code>password</code></li>
-                <li>Staff: <code>staff</code> / <code>password</code></li>
+                <li>Admin: <code>admin</code> / <code>admin123</code></li>
+                <li>Staff: <code>staff</code> / <code>staff123</code></li>
               </ul>
             </div>
           </form>

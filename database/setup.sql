@@ -52,9 +52,9 @@ CREATE TABLE IF NOT EXISTS alert_responses (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Initial Admin Account (Password: admin123 - Use a BCrypt hash in production)
+-- Initial Admin Account (User: admin / Pass: admin123)
 INSERT IGNORE INTO users (username, password, full_name, role) 
-VALUES ('admin', '$2a$10$vcy4S.N2mIqX9S8/vV.B.uC6Bw5N6P6xQ6K0z0z0z0z0z0z0z0z', 'System Administrator', 'ADMIN');
+VALUES ('admin', 'admin123', 'System Administrator', 'ADMIN');
 
 -- Sample Data for testing
 INSERT IGNORE INTO donors (name, blood_type, last_donation_date, contact_number, location)
