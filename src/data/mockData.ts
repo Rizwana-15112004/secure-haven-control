@@ -8,7 +8,8 @@ import {
   EmergencyStats,
   SensorData,
   EmergencySupply,
-  CircuitSystem
+  CircuitSystem,
+  Donor
 } from '@/types';
 
 // Helper function to generate occupants
@@ -391,4 +392,25 @@ export const mockCircuits: CircuitSystem[] = [
     lastMaintenance: new Date(Date.now() - 86400000 * 60),
     solution: 'Circuit breaker tripped due to fire damage. Manual reset required after fire suppression. Check for wire damage before restoring power.',
   },
+];
+
+export const mockDonors: Donor[] = [
+  {
+    id: '1',
+    name: 'John Doe',
+    bloodType: 'O+',
+    lastDonationDate: '2023-10-15',
+    contactNumber: '1234567890',
+    location: 'New York',
+    isEligible: true
+  },
+  {
+    id: '2',
+    name: 'Jane Smith',
+    bloodType: 'A-',
+    lastDonationDate: '2023-11-20',
+    contactNumber: '0987654321',
+    location: 'Los Angeles',
+    isEligible: true
+  }
 ];

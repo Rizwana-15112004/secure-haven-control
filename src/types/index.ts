@@ -127,3 +127,13 @@ export interface CircuitSystem {
   lastMaintenance: Date;
   solution?: string;
 }
+export interface Donor {
+  id: string;
+  name: string;
+  bloodType: string;
+  lastDonationDate: string;
+  contactNumber: string;
+  location: string;
+  isEligible: boolean;
+  createdAt?: string;
+}
