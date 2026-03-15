@@ -40,9 +40,19 @@ public class AlertController {
     }
 
     @PostMapping("/broadcast-proximity")
-    public Map<String, String> broadcastProximity(@RequestBody Map<String, Object> payload) {
+    public Map<String, Object> broadcastProximity(@RequestBody Map<String, Object> payload) {
         broadcastingService.broadcast("proximity-alert", payload);
-        return Map.of("status", "success", "message", "Proximity alert broadcasted");
+        
+        // Mock stats for demo purposes 
+        return Map.of(
+            "status", "success",
+            "message", "Proximity alert broadcasted successfully",
+            "smsSent", 142,
+            "emailsSent", 285,
+            "appUsers", broadcastingService.getClientCount(),
+            "radius", "2km",
+            "simulation", true
+        );
     }
     
     @GetMapping
