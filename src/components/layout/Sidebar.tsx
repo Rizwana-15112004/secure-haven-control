@@ -12,7 +12,6 @@ import {
   FileText,
   HelpCircle,
   Siren,
-  Heart,
   Activity,
   Package,
   Zap
@@ -28,7 +27,6 @@ interface SidebarProps {
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['admin', 'staff'] },
   { id: 'monitoring', label: 'Monitoring', icon: Activity, roles: ['admin', 'staff'] },
-  { id: 'donors', label: 'Donors', icon: Heart, roles: ['admin', 'staff'] },
   { id: 'cctv', label: 'CCTV', icon: Video, roles: ['admin'] },
   { id: 'occupants', label: 'Occupants', icon: Users, roles: ['admin'] },
   { id: 'map', label: 'Building Map', icon: Map, roles: ['admin'] },

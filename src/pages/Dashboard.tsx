@@ -19,7 +19,6 @@ import { StaffHelpPanel } from "@/components/dashboard/StaffHelpPanel";
 import { EmergencyAlertPanel } from "@/components/dashboard/EmergencyAlertPanel";
 import { useEmergencyAlerts } from "@/contexts/EmergencyAlertContext";
 import { NearbyVolunteerAlert } from "@/components/dashboard/NearbyVolunteerAlert";
-import { DonorsPanel } from "@/components/dashboard/DonorsPanel";
 import { OccupantDetailModal } from "@/components/modals/OccupantDetailModal";
 import { ZoneDetailModal } from "@/components/modals/ZoneDetailModal";
 import { AllOccupantsModal } from "@/components/modals/AllOccupantsModal";
@@ -460,11 +459,6 @@ export default function Dashboard() {
               <p className="text-muted-foreground">Configure notifications, sensors, GSM module, CCTV, and system preferences.</p>
               <SettingsPanel />
             </div>
-          )}
-
-          {/* Donors View */}
-          {activeTab === 'donors' && (
-            <DonorsPanel />
           )}
 
           {/* Help View */}
