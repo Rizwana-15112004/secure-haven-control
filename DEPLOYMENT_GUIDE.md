@@ -37,7 +37,8 @@ Render will run your Java server in the cloud for free.
     *   `DB_PASS` = (Your TiDB Password)
     *   `DB_NAME` = `test` (or whatever you named it in TiDB)
 7.  **Deploy**: Click **"Create Web Service"**.
-    *   If Render asks for a **Start Command** anyway, use: `java -jar target/*.jar`
+    *   If Render asks for a **Start Command**, copy and paste exactly this: 
+        `java -jar target/control-0.0.1-SNAPSHOT.jar`
     *   Wait 5-10 minutes for it to build. Note your final URL (e.g., `https://sdrrs-backend.onrender.com`).
 
 ---
