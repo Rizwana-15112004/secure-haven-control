@@ -7,6 +7,7 @@ import { ShieldAlert, KeyRound, User, Siren, ShieldCheck, Loader2 } from "lucide
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { getBackendURL } from "@/config/api";
+import { useVolunteerAlert } from "@/hooks/useVolunteerAlert";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -14,6 +15,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { connected } = useVolunteerAlert();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,20 +157,35 @@ export default function Login() {
           </form>
         </div>
 
-        {/* Public Alert Receiver - Crucial for "Non-App" Demo */}
-        <div className="bg-danger/10 border border-danger/30 rounded-xl p-4 flex items-center justify-between text-[11px] animate-in fade-in slide-in-from-top-4 duration-700">
+        {/* Public Alert Receiver - "Government Model" Demo */}
+        <div className={`border rounded-xl p-4 flex items-center justify-between text-[11px] transition-all duration-500 ${connected ? 'bg-success/10 border-success/30' : 'bg-danger/10 border-danger/30 animate-pulse'}`}>
            <div className="flex items-center gap-3">
-             <div className="bg-danger/20 p-2 rounded-full animate-pulse">
-               <Siren className="h-4 w-4 text-danger" />
+             <div className={`p-2 rounded-full ${connected ? 'bg-success/20' : 'bg-danger/20'}`}>
+               <Siren className={`h-4 w-4 ${connected ? 'text-success' : 'text-danger'} ${connected ? 'animate-bounce' : 'animate-ping'}`} />
              </div>
              <div>
-               <p className="font-black text-danger uppercase tracking-tighter">Public Alert Receiver Active</p>
-               <p className="text-white/40">Monitoring local cellular emergency frequencies...</p>
+               <p className={`font-black uppercase tracking-tighter ${connected ? 'text-success' : 'text-danger'}`}>
+                 {connected ? 'Cellular Node Active' : 'Searching for Signal'}
+               </p>
+               <p className="text-white/40 italic">
+                 {connected ? 'Phone triangulated by Emergency Tower KL-01' : 'Establishing link to SDRRS Disaster Network...'}
+               </p>
              </div>
            </div>
-           <div className="flex items-center gap-1.5 bg-black/40 px-2 py-1 rounded border border-white/5">
-              <div className="h-1.5 w-1.5 bg-success rounded-full animate-ping" />
-              <span className="text-success font-bold uppercase text-[9px]">LIVE</span>
+           <div className="flex flex-col items-end gap-1">
+             <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded border border-white/5 ${connected ? 'bg-success/20 text-success' : 'bg-danger/20 text-danger'}`}>
+                <div className={`h-1.5 w-1.5 rounded-full ${connected ? 'bg-success' : 'bg-danger'} ${connected ? 'animate-ping' : ''}`} />
+                <span className="font-bold uppercase text-[8px]">{connected ? 'Triangulated' : 'Offline'}</span>
+             </div>
+             {connected && (
+               <button 
+                 onClick={() => {
+                   if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
+                   toast({ title: "Signal Test", description: "Connection to Emergency Tower is stable." });
+                 }}
+                 className="text-[8px] text-white/20 underline hover:text-white/40 font-bold uppercase tracking-widest mt-1"
+               >Test Link</button>
+             )}
            </div>
         </div>
 

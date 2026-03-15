@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Send, Megaphone, ShieldCheck, Mail, MessageSquare, CheckCircle2, Loader2, Info } from "lucide-react";
+import { MapPin, Send, Megaphone, ShieldCheck, Mail, MessageSquare, CheckCircle2, Loader2, Info, Siren } from "lucide-react";
 import { useVolunteerAlert } from "@/hooks/useVolunteerAlert";
 import { toast } from "@/hooks/use-toast";
 
@@ -160,29 +160,46 @@ export function ProximityAlertPanel() {
           </div>
         </div>
 
-        {/* NEW: Public Demo Instructions for Teacher */}
-        <div className="bg-black/40 border border-white/5 p-3 rounded-lg flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <p className="text-[10px] font-bold uppercase text-white/40 tracking-widest">Teacher Demo: Public Reach</p>
-            <div className="h-2 w-2 bg-success rounded-full animate-pulse" />
-          </div>
-          <div className="flex gap-4 items-center">
-            <div className="h-20 w-20 bg-white p-1 rounded-sm shrink-0">
-               <img 
-                 src={`https://chart.googleapis.com/chart?cht=qr&chl=${encodeURIComponent(window.location.origin + '/login')}&chs=160x160&chld=L|0`} 
-                 alt="Scan URL for Phone Demo"
-                 className="w-full h-full"
-               />
-            </div>
-            <div className="space-y-1">
-              <p className="text-[9px] text-white/80 font-medium">To show how <span className="text-danger font-bold">People WITHOUT the app</span> get alerts:</p>
-              <p className="text-[8px] text-white/40 leading-tight italic">
-                1. Scan this QR code with your phone (or a teacher's phone).<br/>
-                2. Keep the Login page open (No login needed).<br/>
-                3. Click "EXECUTE" below and the phone will alert!
+        {/* Cellular Signal Propagation for Demo */}
+        <div className="bg-black/60 border border-white/10 p-4 rounded-xl relative overflow-hidden h-[120px]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,0,0,0.05)_0%,transparent_70%)]" />
+          
+          <div className="flex justify-between items-start relative z-10 mb-2">
+            <div>
+              <p className="text-[10px] font-black text-danger uppercase flex items-center gap-2">
+                <Siren className="h-3 w-3 animate-bounce" /> Local Tower: KL-01 Active
               </p>
+              <p className="text-[8px] text-white/40 uppercase tracking-widest font-bold">Simulated GSM Broadcast Protocol</p>
+            </div>
+            <div className="flex items-center gap-2 bg-danger/10 px-2 py-0.5 rounded border border-danger/20">
+              <span className="text-[8px] text-danger font-black animate-pulse">TRIANGULATING...</span>
             </div>
           </div>
+
+          <div className="flex items-center justify-around h-12 relative">
+             {/* Animating Wave Signal */}
+             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="h-8 w-8 border-2 border-danger/30 rounded-full animate-ping" />
+                <div className="h-16 w-16 border border-danger/20 rounded-full animate-ping [animation-delay:0.5s]" />
+                <div className="h-24 w-24 border border-danger/10 rounded-full animate-ping [animation-delay:1s]" />
+             </div>
+             
+             <div className="text-center z-10">
+               <div className="text-xl font-black text-white leading-none">8</div>
+               <div className="text-[7px] text-white/40 font-bold uppercase">People (5m)</div>
+             </div>
+             
+             <div className="h-10 w-[1px] bg-white/10" />
+
+             <div className="text-center z-10">
+               <div className="text-xl font-black text-white leading-none">{connected ? "1" : "0"}</div>
+               <div className="text-[7px] text-white/40 font-bold uppercase">Gov Monitors</div>
+             </div>
+          </div>
+
+          <p className="text-[8px] text-center text-white/20 mt-2 italic">
+            *This mode bypasses typical app barriers to reach regular mobiles via simulated GSM Triangulation.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
