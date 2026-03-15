@@ -13,17 +13,7 @@ TiDB Cloud is a free MySQL-compatible database.
     *   Click the **"Connect"** button in the top right.
     *   Select **"Standard Connection"**.
     *   Note down your **Host**, **User**, **Password**, and **Database Name** (usually `test`).
-4.  **Import Data**: 
-    *   First, run the SQL code from your `database/setup.sql` file in the TiDB SQL console to create the tables.
-    *   Then, use the **"Import"** tab in TiDB Cloud to upload the CSV files I created for you in the `database/csv_import/` folder.
-
----
-
-## Part 1.5: CSV Data Files for Import
-If TiDB asks for CSV files, I have prepared them for you here. You can download them from your GitHub or find them in these local paths:
-*   [users.csv](file:///home/rizwana-nazin/Downloads/secure-haven-control-main/database/csv_import/users.csv) (Import into `users` table)
-*   [donors.csv](file:///home/rizwana-nazin/Downloads/secure-haven-control-main/database/csv_import/donors.csv) (Import into `donors` table)
-*   [alerts.csv](file:///home/rizwana-nazin/Downloads/secure-haven-control-main/database/csv_import/alerts.csv) (Import into `alerts` table)
+4.  **Import Data**: Use the SQL console in TiDB to run the code from your `database/setup.sql` file.
 
 ---
 
