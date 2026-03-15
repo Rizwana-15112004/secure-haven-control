@@ -15,6 +15,9 @@ export default defineConfig(({ mode }) => ({
       strategies: 'injectManifest',
       srcDir: 'src',
       filename: 'sw.js',
+      injectManifest: {
+        swDest: 'dist/service-worker.js'
+      },
       registerType: 'autoUpdate',
       devOptions: { enabled: true },
       includeAssets: ['favicon.ico', 'robots.txt'],
