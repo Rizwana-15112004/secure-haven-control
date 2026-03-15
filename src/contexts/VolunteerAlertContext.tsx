@@ -84,10 +84,25 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
             setProximityAlert(data);
             if ('vibrate' in navigator) navigator.vibrate([500, 100, 500, 100, 500]);
             if (Notification.permission === 'granted') {
-              new Notification('🚨 DISASTER RADIUS ALERT', {
-                body: `Emergency Alert: ${data.title}`,
-                icon: '/favicon.ico',
-              });
+              // If tab is hidden or screen is off, trigger a system-level notification
+              if (document.hidden) {
+                if ('serviceWorker' in navigator) {
+                  navigator.serviceWorker.ready.then(registration => {
+                    registration.showNotification('🚨 DISASTER RADIUS ALERT', {
+                      body: `Emergency Alert: ${data.title}`,
+                      icon: '/favicon.ico',
+                      vibrate: [500, 100, 500, 100, 500],
+                      tag: 'emergency-proximity-alert',
+                      requireInteraction: true
+                    });
+                  });
+                }
+              } else {
+                new Notification('🚨 DISASTER RADIUS ALERT', {
+                  body: `Emergency Alert: ${data.title}`,
+                  icon: '/favicon.ico',
+                });
+              }
             }
           } catch (err) {
             console.error("Error parsing proximity alert:", err);

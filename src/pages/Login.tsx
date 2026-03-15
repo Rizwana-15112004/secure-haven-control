@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,9 +13,37 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [wakeLocked, setWakeLocked] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
   const { connected } = useVolunteerAlert();
+
+  useEffect(() => {
+    // 1. Request Notification Permissions for Background Alerts
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+
+    // 2. Request Wake Lock to prevent screen sleep during demo
+    let wakeLock: any = null;
+    const requestWakeLock = async () => {
+      try {
+        if ("wakeLock" in navigator) {
+          wakeLock = await (navigator as any).wakeLock.request("screen");
+          setWakeLocked(true);
+          console.log("Wake Lock is active");
+        }
+      } catch (err) {
+        console.error(`${err.name}, ${err.message}`);
+      }
+    };
+
+    requestWakeLock();
+
+    return () => {
+      if (wakeLock) wakeLock.release().then(() => setWakeLocked(false));
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -177,11 +205,16 @@ export default function Login() {
                 <div className={`h-1.5 w-1.5 rounded-full ${connected ? 'bg-success' : 'bg-danger'} ${connected ? 'animate-ping' : ''}`} />
                 <span className="font-bold uppercase text-[8px]">{connected ? 'Triangulated' : 'Offline'}</span>
              </div>
+             {wakeLocked && (
+               <div className="text-[7px] text-success/60 font-black uppercase tracking-tighter flex items-center gap-1">
+                 <ShieldCheck className="h-2.5 w-2.5" /> Screen Sleep Disabled
+               </div>
+             )}
              {connected && (
                <button 
                  onClick={() => {
                    if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
-                   toast({ title: "Signal Test", description: "Connection to Emergency Tower is stable." });
+                   toast({ title: "Signal Test", description: "Connection to Emergency Tower is stable. Background listening active." });
                  }}
                  className="text-[8px] text-white/20 underline hover:text-white/40 font-bold uppercase tracking-widest mt-1"
                >Test Link</button>

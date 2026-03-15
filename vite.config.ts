@@ -12,6 +12,9 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'public',
+      filename: 'service-worker.js',
       registerType: 'autoUpdate',
       devOptions: { enabled: true },
       includeAssets: ['favicon.ico', 'robots.txt'],
