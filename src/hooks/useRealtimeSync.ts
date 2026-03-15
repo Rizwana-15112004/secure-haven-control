@@ -2,17 +2,16 @@ import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/hooks/use-toast';
 
-const getServerURL = () => {
-  const ip = localStorage.getItem('serverIP') || window.location.hostname;
-  // Node alert server runs on 3001. Note: 'donor_updated' events require the Java backend on 8080.
-  return `${window.location.protocol}//${ip}:3001`;
-};
+import { getAlertServerURL, getBackendURL } from '@/config/api';
+
+const SERVER = getAlertServerURL();
+const BACKEND = getBackendURL();
 
 export function useRealtimeSync() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const url = `${getServerURL()}/events`;
+    const url = `${BACKEND}/api/alerts/events`;
     let es: EventSource;
 
     const connect = () => {

@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { ShieldAlert, KeyRound, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
+import { getBackendURL } from "@/config/api";
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -19,12 +20,11 @@ export default function Login() {
     setIsLoading(true);
 
     try {
-      const ip = localStorage.getItem('serverIP') || window.location.hostname;
-      const protocol = window.location.protocol;
+      const backendUrl = getBackendURL();
       
       let response;
       try {
-        response = await fetch(`${protocol}//${ip}:8080/api/auth/login`, {
+        response = await fetch(`${backendUrl}/api/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password })

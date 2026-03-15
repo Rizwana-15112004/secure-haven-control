@@ -1,12 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
 
-// The alert server runs on port 3001
-const getServerURL = () => {
-  const ip = localStorage.getItem('serverIP') || window.location.hostname;
-  return `${window.location.protocol}//${ip}:3001`;
-};
+import { getAlertServerURL } from '@/config/api';
 
-const SERVER = getServerURL();
+const SERVER = getAlertServerURL();
 
 export type VolunteerAlertPayload = {
   id?: number;
