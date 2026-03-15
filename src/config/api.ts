@@ -2,8 +2,8 @@ export const getBackendURL = () => {
   const envUrl = import.meta.env.VITE_API_URL;
   if (envUrl) return envUrl;
 
-  // If on Vercel/Production, default to the live Render backend
-  if (window.location.hostname.includes('vercel.app')) {
+  // Default to live Render backend in any production build (Web or Android)
+  if (import.meta.env.PROD || window.location.hostname.includes('vercel.app')) {
     return 'https://sdrrs-backend.onrender.com';
   }
 
@@ -12,6 +12,5 @@ export const getBackendURL = () => {
 };
 
 export const getAlertServerURL = () => {
-  // Alert server is now integrated into the Java backend for SSE
   return getBackendURL();
 };
