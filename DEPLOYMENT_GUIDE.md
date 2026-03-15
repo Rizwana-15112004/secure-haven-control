@@ -8,11 +8,13 @@ This guide provides the exact, click-by-click steps to host your SDRRS system fo
 TiDB Cloud is a free MySQL-compatible database.
 1.  **Sign Up**: Go to [TiDB Cloud](https://pingcap.com/tidb-cloud) and create a free account.
 2.  **Create Cluster**: Click **"Create Cluster"** and choose the **"Serverless" (Free Tier)**.
-3.  **Get Connection Details**: 
+3.  **Get Connection Details & Set Password**: 
     *   Click on your cluster name.
     *   Click the **"Connect"** button in the top right.
+    *   **CRITICAL STEP**: Look for the **"Password"** section. Click **"Reset Password"** or **"Generate"**. 
+    *   **Write this password down!** This is your **DB_PASS**. It has *nothing* to do with your GitHub or Render password.
     *   Select **"Standard Connection"**.
-    *   Note down your **Host**, **User**, **Password**, and **Database Name** (usually `test`).
+    *   Note down your **Host**, **User**, and **Database Name** (usually `test`).
 4.  **Import Data**: Use the SQL console in TiDB to run the code from your `database/setup.sql` file.
 
 ---
