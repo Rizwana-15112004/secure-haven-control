@@ -13,7 +13,7 @@ interface SimulationStep {
 }
 
 export function ProximityAlertPanel() {
-  const { broadcastProximity, connected } = useVolunteerAlert();
+  const { broadcastProximity, triggerProximityAlert, connected } = useVolunteerAlert();
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState<any>(null);
   const [steps, setSteps] = useState<SimulationStep[]>([]);
@@ -67,13 +67,20 @@ export function ProximityAlertPanel() {
         ...prev.slice(3)
       ]);
 
-      const result = await broadcastProximity({
+      const payload = {
         type: 'RADIUS_EMERGENCY',
         ...details,
         radius: demoRadius === '5m' ? 5 : 2000,
         timestamp: new Date().toISOString(),
         demoTarget: 'NON_APP_SMS'
-      });
+      };
+
+      const result = await broadcastProximity(payload);
+      
+      // Auto-trigger for the sender to ensure demo works on their phone
+      setTimeout(() => {
+        triggerProximityAlert(payload);
+      }, 500);
       
       // Step 3: Triangulation
       await new Promise(r => setTimeout(r, 1000));

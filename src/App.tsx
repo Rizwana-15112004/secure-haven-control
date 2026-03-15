@@ -9,8 +9,8 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import { HelpChat } from "@/components/chat/HelpChat";
 import { EmergencyAlertProvider } from "@/contexts/EmergencyAlertContext";
+import { VolunteerAlertProvider, useVolunteerAlert } from "@/contexts/VolunteerAlertContext";
 import { VolunteerAlertOverlay } from "@/components/VolunteerAlertOverlay";
-import { useVolunteerAlert } from "@/hooks/useVolunteerAlert";
 import { useOfflineSync } from './hooks/useOfflineSync';
 import { useRealtimeSync } from './hooks/useRealtimeSync';
 const queryClient = new QueryClient();
@@ -37,30 +37,32 @@ function GlobalAlertListener() {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <EmergencyAlertProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          {/* Global alert overlay — shows on every phone that has the app open */}
-          <GlobalAlertListener />
-          <BrowserRouter>
-            <HelpChat />
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <Index />
-                  </ProtectedRoute>
-                }
-              />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </EmergencyAlertProvider>
+      <VolunteerAlertProvider>
+        <EmergencyAlertProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            {/* Global alert overlay — shows on every phone that has the app open */}
+            <GlobalAlertListener />
+            <BrowserRouter>
+              <HelpChat />
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route
+                  path="/"
+                  element={
+                    <ProtectedRoute>
+                      <Index />
+                    </ProtectedRoute>
+                  }
+                />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </EmergencyAlertProvider>
+      </VolunteerAlertProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
