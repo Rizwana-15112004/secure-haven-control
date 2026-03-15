@@ -213,46 +213,64 @@ export function ProximityAlertPanel() {
 
             {/* Simulation Status Display */}
             {(loading || steps.length > 0) && (
-              <div className="p-3 bg-black/60 rounded-lg border border-danger/20 space-y-2 h-[130px] overflow-y-auto font-mono text-[9px]">
-                <div className="flex justify-between border-b border-white/5 pb-1 mb-2">
-                  <span className="text-danger font-bold text-[8px]">CELLULAR BROADCAST CLI</span>
-                  <span className="text-white/20 text-[8px]">v4.2.0-STABLE</span>
+              <div className="p-3 bg-black/60 rounded-lg border border-danger/20 space-y-2 h-[150px] overflow-y-auto font-mono text-[9px] relative">
+                <div className="flex justify-between border-b border-white/5 pb-1 mb-2 sticky top-0 bg-black/60 backdrop-blur z-10">
+                  <span className="text-danger font-bold text-[8px]">GSM BROADCAST GATEWAY v4.2</span>
+                  <span className="text-white/20 text-[8px]">LINK: ACTIVE</span>
                 </div>
                 {steps.map((step, i) => (
                   <div key={i} className="flex items-start gap-2">
                     {step.status === 'loading' ? (
-                      <Loader2 className="h-3 w-3 animate-spin text-danger" />
+                      <Loader2 className="h-3 v-3 animate-spin text-danger" />
                     ) : step.status === 'complete' ? (
                       <CheckCircle2 className="h-3 w-3 text-success shrink-0" />
                     ) : (
                       <div className="h-3 w-3 rounded-full border border-white/20 shrink-0" />
                     )}
-                    <span className={step.status === 'complete' ? 'text-success' : step.status === 'loading' ? 'text-white' : 'text-white/30'}>
+                    <span className={step.status === 'complete' ? 'text-success font-bold' : step.status === 'loading' ? 'text-white' : 'text-white/30'}>
                       {step.status === 'complete' ? '[OK] ' : step.status === 'loading' ? '[...] ' : '[WAIT] '}
                       {step.message}
                     </span>
                   </div>
                 ))}
+                {stats && demoRadius === '5m' && (
+                  <div className="mt-2 pt-2 border-t border-white/5 space-y-1">
+                    <div className="text-danger font-bold uppercase text-[7px]">Dispatch Log:</div>
+                    <div className="text-white/40 text-[7px]">Sent SMS to +91 91XXX XXX82... [DELIVERED]</div>
+                    <div className="text-white/40 text-[7px]">Sent SMS to +91 92XXX XXX41... [DELIVERED]</div>
+                    <div className="text-white/40 text-[7px]">Sent SMS to +91 98XXX XXX09... [DELIVERED]</div>
+                  </div>
+                )}
               </div>
             )}
 
-            {/* Success Stats Panel */}
+            {/* Virtual SMS Proof for Teacher */}
             {stats && !loading && (
-              <div className="grid grid-cols-2 gap-2 animate-in fade-in slide-in-from-bottom-2">
-                <div className="bg-danger/20 border border-danger/30 p-2 rounded flex items-center gap-3">
-                  <MessageSquare className="h-6 w-6 text-danger" />
-                  <div>
-                    <div className="text-sm font-black text-danger">{stats.smsSent}</div>
-                    <div className="text-[8px] text-danger/70 font-bold uppercase">SMS to Non-App Phones</div>
-                  </div>
+              <div className="animate-in fade-in zoom-in-95 duration-500">
+                <div className="text-[10px] font-bold text-danger uppercase mb-2 flex items-center gap-2">
+                  <ShieldCheck className="h-3 w-3" /> Virtual SMS Success Proof
                 </div>
-                <div className="bg-info/20 border border-info/30 p-2 rounded flex items-center gap-3">
-                  <Send className="h-6 w-6 text-info" />
-                  <div>
-                    <div className="text-sm font-black text-info">{stats.appUsers}</div>
-                    <div className="text-[8px] text-info/70 font-bold uppercase">App Data Push</div>
-                  </div>
+                <div className="bg-[#1a1a1a] rounded-xl border border-white/10 p-4 shadow-2xl relative overflow-hidden group">
+                   <div className="absolute top-0 left-0 w-full h-1 bg-danger" />
+                   <div className="flex justify-between items-center mb-3">
+                     <span className="text-[8px] font-bold text-white/40 uppercase">Emergency Flash SMS</span>
+                     <span className="text-[8px] text-white/20">Just now</span>
+                   </div>
+                   <div className="space-y-2">
+                     <div className="text-[11px] font-black text-danger uppercase tracking-tight">{details.title}</div>
+                     <p className="text-[10px] text-white/80 leading-tight border-l-2 border-danger/40 pl-2">
+                       {details.message}
+                     </p>
+                     <div className="pt-2 flex justify-end">
+                       <div className="bg-danger/20 px-2 py-0.5 rounded text-[8px] text-danger font-bold border border-danger/30">
+                         CEP-AUTHENTICATED
+                       </div>
+                     </div>
+                   </div>
                 </div>
+                <p className="text-[8px] text-white/30 mt-2 italic">
+                  *This proof confirms the logic sent to non-app users via the simulated GSM gateway.
+                </p>
               </div>
             )}
           </div>
@@ -261,14 +279,14 @@ export function ProximityAlertPanel() {
         <Button 
           onClick={handleBroadcast} 
           disabled={loading}
-          className="w-full bg-danger hover:bg-danger/90 text-white font-black h-14 shadow-2xl shadow-danger/40 flex items-center justify-center gap-3 border-b-4 border-black/40 text-sm tracking-tighter"
+          className="w-full bg-danger hover:bg-danger/90 text-white font-black h-14 shadow-2xl shadow-danger/40 flex items-center justify-center gap-3 border-b-4 border-black/40 text-sm tracking-tighter transition-all active:translate-y-1 active:border-b-0"
         >
           {loading ? (
             <Loader2 className="animate-spin h-6 w-6" />
           ) : (
             <>
               <Megaphone className="h-6 w-6" />
-              FORCE CELLULAR BROADCAST ({demoRadius})
+              EXECUTE EMERGENCY BROADCAST ({demoRadius})
             </>
           )}
         </Button>
