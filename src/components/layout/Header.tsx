@@ -79,13 +79,14 @@ export function Header({ alertCount, isEmergency, onMenuToggle, menuOpen, onAler
               {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
             <div className={cn(
-              "p-2 rounded-lg",
-              isEmergency ? "bg-danger/20 animate-pulse" : "bg-secondary"
+              "overflow-hidden rounded-lg w-10 h-10 flex items-center justify-center bg-transparent",
+              isEmergency && "animate-pulse"
             )}>
-              <Shield className={cn(
-                "w-6 h-6",
-                isEmergency ? "text-danger" : "text-info"
-              )} />
+              <img 
+                src="/pwa-192x192.png" 
+                alt="SDRRS Logo" 
+                className="w-full h-full object-contain"
+              />
             </div>
             <div>
               <h1 className="font-display text-lg md:text-xl font-bold tracking-wider">
@@ -108,7 +109,7 @@ export function Header({ alertCount, isEmergency, onMenuToggle, menuOpen, onAler
           )}
 
           {/* Right Section */}
-          <div className="flex items-center gap-2 md:gap-4">
+          <div className="flex items-center gap-1.5 md:gap-4">
             {/* System Status */}
             <div className="hidden md:flex items-center gap-4 text-xs text-muted-foreground">
               <div className="flex items-center gap-1">
@@ -160,8 +161,8 @@ export function Header({ alertCount, isEmergency, onMenuToggle, menuOpen, onAler
             {/* User Profile / Logout Popover */}
             <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
               <PopoverTrigger asChild>
-                <Button variant="secondary" size="icon" className="hidden sm:flex">
-                  <User className="w-5 h-5" />
+                <Button variant="secondary" size="icon" className="flex">
+                  <User className="w-4 h-4 md:w-5 md:h-5" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-56 p-2" align="end">
@@ -181,8 +182,8 @@ export function Header({ alertCount, isEmergency, onMenuToggle, menuOpen, onAler
             </Popover>
 
             {/* Settings */}
-            <Button variant="secondary" size="icon" className="hidden sm:flex" onClick={onSettingsClick}>
-              <Settings className="w-5 h-5" />
+            <Button variant="secondary" size="icon" className="flex" onClick={onSettingsClick}>
+              <Settings className="w-4 h-4 md:w-5 md:h-5" />
             </Button>
           </div>
         </div>

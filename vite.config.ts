@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => ({
         ]
       },
       manifest: {
-        name: 'Secure Haven Control',
+        name: 'Secure Haven Control - Disaster Response',
         short_name: 'SecureHaven',
         description: 'Smart Disaster Response & Rescue System — works offline',
         theme_color: '#0f172a',

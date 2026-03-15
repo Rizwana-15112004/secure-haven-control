@@ -4,7 +4,8 @@ import { toast } from '@/hooks/use-toast';
 
 const getServerURL = () => {
   const ip = localStorage.getItem('serverIP') || window.location.hostname;
-  return `${window.location.protocol}//${ip}:8080/api/alerts`;
+  // Node alert server runs on 3001. Note: 'donor_updated' events require the Java backend on 8080.
+  return `${window.location.protocol}//${ip}:3001`;
 };
 
 export function useRealtimeSync() {

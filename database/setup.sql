@@ -52,9 +52,11 @@ CREATE TABLE IF NOT EXISTS alert_responses (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Initial Admin Account (User: admin / Pass: admin123)
+-- Initial Accounts (User: admin / Pass: admin123) and (User: staff / Pass: staff123)
 INSERT IGNORE INTO users (username, password, full_name, role) 
-VALUES ('admin', 'admin123', 'System Administrator', 'ADMIN');
+VALUES 
+('admin', 'admin123', 'System Administrator', 'ADMIN'),
+('staff', 'staff123', 'Rescue Staff', 'VOLUNTEER');
 
 -- Sample Data for testing
 INSERT IGNORE INTO donors (name, blood_type, last_donation_date, contact_number, location)

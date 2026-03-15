@@ -49,7 +49,7 @@ export function VolunteerAlertOverlay({ alert, onDismiss }: Props) {
             <div className="flex items-center gap-2 bg-red-600 px-4 py-1.5 rounded-full border border-red-400 shadow-[0_0_15px_rgba(239,68,68,0.4)]">
               <MapPin className="h-4 w-4 text-white animate-bounce" />
               <span className="text-xs font-black text-white uppercase tracking-widest">
-                Rescue Zone: Within 5m
+                Rescue Zone: Within {alert.radius >= 1000 ? `${(alert.radius/1000).toFixed(1)}km` : `${alert.radius}m`}
               </span>
             </div>
             <p className="text-red-400 text-[10px] uppercase font-bold tracking-widest animate-pulse">

@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 // The alert server runs on port 3001
 const getServerURL = () => {
   const ip = localStorage.getItem('serverIP') || window.location.hostname;
-  return `${window.location.protocol}//${ip}:8080/api/alerts`;
+  return `${window.location.protocol}//${ip}:3001`;
 };
 
 const SERVER = getServerURL();
@@ -19,6 +19,7 @@ export type VolunteerAlertPayload = {
   deviceCount: number;
   adminLat?: number;
   adminLon?: number;
+  radius?: number;
 };
 
 // Helper for Haversine distance
@@ -79,8 +80,9 @@ export function useVolunteerAlert() {
               const targetLon = alertData.adminLon || 76.3485;
               
               const distance = getDistance(latitude, longitude, targetLat, targetLon);
+              const allowedRadius = alertData.radius || 2000; // Default to 2km if not set
               
-              if (distance <= 5) {
+              if (distance <= allowedRadius) {
                 setIncomingAlert(alertData);
                 if ('vibrate' in navigator) navigator.vibrate([400, 200, 400, 200, 800]);
                 if (Notification.permission === 'granted') {

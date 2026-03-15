@@ -96,8 +96,11 @@ export function HelpChat() {
       addAlert(alertPayload);
 
       try {
-        const serverIP = localStorage.getItem('serverIP') || `http://${window.location.hostname}:8080/api/alerts`;
-        await fetch(`${serverIP}/send-alert`, {
+        const protocol = window.location.protocol;
+        const host = window.location.hostname;
+        const alertServer = localStorage.getItem('serverIP') ? `${protocol}//${localStorage.getItem('serverIP')}:3001` : `${protocol}//${host}:3001`;
+        
+        await fetch(`${alertServer}/send-alert`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ type: 'staff_sos', ...alertPayload })

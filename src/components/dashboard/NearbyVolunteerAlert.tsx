@@ -16,6 +16,11 @@ import {
   Wifi,
   WifiOff,
 } from "lucide-react";
+import { 
+  Tabs, 
+  TabsList, 
+  TabsTrigger 
+} from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import { useVolunteerAlert } from "@/hooks/useVolunteerAlert";
 
@@ -28,6 +33,7 @@ const BUILDING_LON = 76.3485;
 export function NearbyVolunteerAlert() {
   const { connected, deviceCount, sendAlert } = useVolunteerAlert();
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [radius, setRadius] = useState<number>(5); // Default to demo 5m
 
   const handleSend = () => {
     if (!connected) {
@@ -47,13 +53,14 @@ export function NearbyVolunteerAlert() {
       message: "A disaster has occurred in the building next to you. People are trapped and need your help. Please proceed to the location RIGHT NOW. Every second counts!",
       adminLat: BUILDING_LAT,
       adminLon: BUILDING_LON,
+      radius: radius,
     });
 
     setConfirmOpen(false);
 
     toast({
       title: `🚨 SOS Broadcast Sent!`,
-      description: "Phones within 5m radius will receive the emergency popup.",
+      description: `Phones within ${radius >= 1000 ? `${radius/1000}km` : `${radius}m`} radius will receive the emergency popup.`,
       variant: "destructive",
     });
   };
@@ -104,21 +111,31 @@ export function NearbyVolunteerAlert() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-3 my-1">
+          <div className="space-y-4 my-1">
+            <div className="space-y-2">
+              <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Select Alert Radius</p>
+              <Tabs value={radius.toString()} onValueChange={(v) => setRadius(parseInt(v))} className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="5" className="text-xs">Demo Mode (5m)</TabsTrigger>
+                  <TabsTrigger value="2000" className="text-xs">Real Mode (2km)</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+
             <div className="p-3 bg-orange-500/10 border border-orange-500/30 rounded-xl text-sm space-y-1">
               <p className="font-semibold text-orange-500">📣 Alert Preview:</p>
-              <p className="text-muted-foreground text-xs">
+              <p className="text-muted-foreground text-xs leading-tight">
                 "🚨 People TRAPPED — Volunteer Help Needed Immediately!"
               </p>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <MapPin className="h-4 w-4 text-orange-400 shrink-0" />
-              <span className="text-muted-foreground text-xs">{BUILDING_ADDRESS}</span>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <MapPin className="h-3.5 w-3.5 text-orange-400 shrink-0" />
+              <span className="text-[11px] truncate">{BUILDING_ADDRESS}</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
-              <Users className="h-4 w-4 text-orange-400 shrink-0" />
-              <span className="text-muted-foreground text-xs">
-                <strong>{deviceCount} phone{deviceCount !== 1 ? 's' : ''}</strong> will receive this alert RIGHT NOW
+              <Users className="h-3.5 w-3.5 text-orange-400 shrink-0" />
+              <span className="text-[11px] text-muted-foreground">
+                Targeting <strong>within {radius >= 1000 ? `${radius/1000}km` : `${radius}m`}</strong> of building
               </span>
             </div>
             {!connected && (
