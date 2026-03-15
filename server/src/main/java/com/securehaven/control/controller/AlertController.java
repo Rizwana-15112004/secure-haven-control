@@ -2,6 +2,7 @@ package com.securehaven.control.controller;
 
 import com.securehaven.control.model.Alert;
 import com.securehaven.control.repository.AlertRepository;
+import com.securehaven.control.service.BroadcastingService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
