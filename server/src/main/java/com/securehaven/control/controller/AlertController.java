@@ -43,14 +43,17 @@ public class AlertController {
     public Map<String, Object> broadcastProximity(@RequestBody Map<String, Object> payload) {
         broadcastingService.broadcast("proximity-alert", payload);
         
+        Integer radius = (Integer) payload.get("radius");
+        boolean isSmallRadius = radius != null && radius <= 10;
+        
         // Mock stats for demo purposes 
         return Map.of(
             "status", "success",
             "message", "Proximity alert broadcasted successfully",
-            "smsSent", 142,
-            "emailsSent", 285,
+            "smsSent", isSmallRadius ? 8 : 142,
+            "emailsSent", isSmallRadius ? 5 : 285,
             "appUsers", broadcastingService.getClientCount(),
-            "radius", "2km",
+            "radius", isSmallRadius ? "5m" : "2km",
             "simulation", true
         );
     }
