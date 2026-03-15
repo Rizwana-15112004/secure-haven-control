@@ -43,6 +43,18 @@ Render will run your Java server in the cloud for free.
 
 ---
 
+## Part 2B: Alternative Backend Hosting (Koyeb.com) - FREE
+If Render is giving you trouble, Koyeb is a great "Forever Free" alternative.
+1.  **Sign Up**: Go to [Koyeb.com](https://www.koyeb.com/) and create a free account (No credit card).
+2.  **Create Service**: Click **"Create Service"**.
+3.  **App Source**: Select **"GitHub"** and choose your repository.
+4.  **Builder**: Select **"Docker"** (It should detect the Dockerfile in your `server` folder).
+5.  **Environment Variables**: Add the same variables as Render:
+    *   `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME`.
+6.  **Deploy**: Click **"Deploy"**. Koyeb is often faster than Render!
+
+---
+
 ## Part 3: Host your Web App (Vercel) - FREE
 Vercel will host the website part for free.
 1.  **Sign Up**: Log in to [Vercel.com](https://vercel.com).
