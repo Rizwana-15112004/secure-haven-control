@@ -23,6 +23,9 @@ import { OccupantDetailModal } from "@/components/modals/OccupantDetailModal";
 import { ZoneDetailModal } from "@/components/modals/ZoneDetailModal";
 import { AllOccupantsModal } from "@/components/modals/AllOccupantsModal";
 import { Button } from "@/components/ui/button";
+import { ProximityAlertPanel } from "@/components/dashboard/ProximityAlertPanel";
+import { RadiusAlertModal } from "@/components/modals/RadiusAlertModal";
+import { useVolunteerAlert } from "@/hooks/useVolunteerAlert";
 import { 
   mockOccupants, 
   mockCameras, 
@@ -70,6 +73,9 @@ export default function Dashboard() {
 
   const activeAlerts = alerts.filter(a => a.isActive);
   const isEmergency = activeAlerts.some(a => a.level === 'critical' || a.level === 'danger');
+
+  // Real-time volunteer alerts
+  const { proximityAlert, dismissProximity } = useVolunteerAlert();
 
   // Handlers
   const handleAcknowledgeAlert = (id: string) => {
@@ -270,6 +276,7 @@ export default function Dashboard() {
                   {/* Alerts Panel */}
                     {isAdmin && (
                       <div className="space-y-4">
+                        <ProximityAlertPanel />
                         <EmergencyAlertPanel />
                         <AlertsPanel 
                           alerts={alerts} 
@@ -499,6 +506,12 @@ export default function Dashboard() {
           setAllOccupantsModalOpen(false);
           handleOccupantSelect(occupant);
         }}
+      />
+      {/* Proximity Alert Modal for all users */}
+      <RadiusAlertModal 
+        isOpen={!!proximityAlert} 
+        onClose={dismissProximity} 
+        alertData={proximityAlert}
       />
     </div>
   );

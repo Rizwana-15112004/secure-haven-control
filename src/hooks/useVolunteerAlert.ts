@@ -33,6 +33,7 @@ export function useVolunteerAlert() {
   const [connected, setConnected] = useState(false);
   const [deviceCount, setDeviceCount] = useState(0);
   const [incomingAlert, setIncomingAlert] = useState<VolunteerAlertPayload | null>(null);
+  const [proximityAlert, setProximityAlert] = useState<any | null>(null);
 
   useEffect(() => {
     // Request notification permission
@@ -67,31 +68,22 @@ export function useVolunteerAlert() {
         es.addEventListener('alert', (e: any) => {
           try {
             const alertData = JSON.parse(e.data) as VolunteerAlertPayload;
-            
-            // Get current location for 5m radius check
-            navigator.geolocation.getCurrentPosition((pos) => {
-              const { latitude, longitude } = pos.coords;
-              
-              const targetLat = alertData.adminLat || 10.1768;
-              const targetLon = alertData.adminLon || 76.3485;
-              
-              const distance = getDistance(latitude, longitude, targetLat, targetLon);
-              const allowedRadius = alertData.radius || 2000; // Default to 2km if not set
-              
-              if (distance <= allowedRadius) {
-                setIncomingAlert(alertData);
-                if ('vibrate' in navigator) navigator.vibrate([400, 200, 400, 200, 800]);
-                if (Notification.permission === 'granted') {
-                  new Notification('🚨 NEARBY EMERGENCY (5m)', {
-                    body: `You are in the immediate rescue zone! Help needed!`,
-                    icon: '/favicon.ico',
-                  });
-                }
-              }
-            }, (err) => {
-              setIncomingAlert(alertData);
-              if ('vibrate' in navigator) navigator.vibrate([400, 200, 400, 200, 800]);
-            }, { enableHighAccuracy: true });
+            setIncomingAlert(alertData);
+            if ('vibrate' in navigator) navigator.vibrate([400, 200, 400, 200, 800]);
+          } catch (_) {}
+        });
+
+        es.addEventListener('proximity-alert', (e: any) => {
+          try {
+            const data = JSON.parse(e.data);
+            setProximityAlert(data);
+            if ('vibrate' in navigator) navigator.vibrate([500, 100, 500, 100, 500]);
+            if (Notification.permission === 'granted') {
+              new Notification('🚨 DISASTER RADIUS ALERT', {
+                body: `Emergency within 2km! Tap to see details.`,
+                icon: '/favicon.ico',
+              });
+            }
           } catch (_) {}
         });
 
@@ -124,7 +116,20 @@ export function useVolunteerAlert() {
     }
   }, []);
 
-  const dismissAlert = useCallback(() => setIncomingAlert(null), []);
+  const broadcastProximity = useCallback(async (data: any) => {
+    try {
+      await fetch(`${SERVER}/broadcast-proximity`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+    } catch (e) {
+      console.error('Failed to broadcast proximity alert', e);
+    }
+  }, []);
 
-  return { connected, deviceCount, incomingAlert, sendAlert, dismissAlert };
+  const dismissAlert = useCallback(() => setIncomingAlert(null), []);
+  const dismissProximity = useCallback(() => setProximityAlert(null), []);
+
+  return { connected, deviceCount, incomingAlert, proximityAlert, sendAlert, broadcastProximity, dismissAlert, dismissProximity };
 }

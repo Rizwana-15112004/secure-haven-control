@@ -38,6 +38,12 @@ public class AlertController {
         broadcastingService.broadcast("alert", savedAlert);
         return savedAlert;
     }
+
+    @PostMapping("/broadcast-proximity")
+    public Map<String, String> broadcastProximity(@RequestBody Map<String, Object> payload) {
+        broadcastingService.broadcast("proximity-alert", payload);
+        return Map.of("status", "success", "message", "Proximity alert broadcasted");
+    }
     
     @GetMapping
     public List<Alert> getAllAlerts() {
