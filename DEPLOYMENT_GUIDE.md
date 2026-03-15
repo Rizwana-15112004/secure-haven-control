@@ -28,13 +28,17 @@ Render will run your Java server in the cloud for free.
 5.  **Settings**:
     *   **Name**: `sdrrs-backend`
     *   **Root Directory**: `server`
+    *   **Runtime/Environment**: Select **"Docker"**. 
+        *   *(Note: If you choose "Docker", you don't need to type a Start Command! My Dockerfile does it for you).*
     *   **Instance Type**: Choose **"Free"** (scroll down to find it).
 6.  **Add Environment Variables**: Click the **"Env Vars"** tab and add these exactly:
     *   `DB_HOST` = (Your TiDB Host)
     *   `DB_USER` = (Your TiDB User)
     *   `DB_PASS` = (Your TiDB Password)
     *   `DB_NAME` = `test` (or whatever you named it in TiDB)
-7.  **Deploy**: Click **"Create Web Service"**. Wait 5-10 minutes for it to build. Note your final URL (e.g., `https://sdrrs-backend.onrender.com`).
+7.  **Deploy**: Click **"Create Web Service"**.
+    *   If Render asks for a **Start Command** anyway, use: `java -jar target/*.jar`
+    *   Wait 5-10 minutes for it to build. Note your final URL (e.g., `https://sdrrs-backend.onrender.com`).
 
 ---
 
