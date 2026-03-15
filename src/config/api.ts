@@ -12,5 +12,5 @@ export const getBackendURL = () => {
 };
 
 export const getAlertServerURL = () => {
-  return getBackendURL();
+  return `${getBackendURL()}/api/alerts`;
 };
