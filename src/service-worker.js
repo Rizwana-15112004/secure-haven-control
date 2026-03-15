@@ -1,6 +1,10 @@
 // Custom Service Worker for Secure Haven Control
 // This ensures alerts can be received even if the browser tab is not active
 
+// Injected by Workbox at build time
+// eslint-disable-next-line no-underscore-dangle
+const manifest = self.__WB_MANIFEST; 
+
 self.addEventListener('install', (event) => {
   console.log('[SW] Service Worker installed');
   self.skipWaiting();
