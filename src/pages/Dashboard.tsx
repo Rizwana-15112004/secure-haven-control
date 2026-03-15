@@ -508,11 +508,6 @@ export default function Dashboard() {
         }}
       />
       {/* Proximity Alert Modal for all users */}
-      <RadiusAlertModal 
-        isOpen={!!proximityAlert} 
-        onClose={dismissProximity} 
-        alertData={proximityAlert}
-      />
     </div>
   );
 }

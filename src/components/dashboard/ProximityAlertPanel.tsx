@@ -160,6 +160,31 @@ export function ProximityAlertPanel() {
           </div>
         </div>
 
+        {/* NEW: Public Demo Instructions for Teacher */}
+        <div className="bg-black/40 border border-white/5 p-3 rounded-lg flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <p className="text-[10px] font-bold uppercase text-white/40 tracking-widest">Teacher Demo: Public Reach</p>
+            <div className="h-2 w-2 bg-success rounded-full animate-pulse" />
+          </div>
+          <div className="flex gap-4 items-center">
+            <div className="h-20 w-20 bg-white p-1 rounded-sm shrink-0">
+               <img 
+                 src={`https://chart.googleapis.com/chart?cht=qr&chl=${encodeURIComponent(window.location.origin + '/login')}&chs=160x160&chld=L|0`} 
+                 alt="Scan URL for Phone Demo"
+                 className="w-full h-full"
+               />
+            </div>
+            <div className="space-y-1">
+              <p className="text-[9px] text-white/80 font-medium">To show how <span className="text-danger font-bold">People WITHOUT the app</span> get alerts:</p>
+              <p className="text-[8px] text-white/40 leading-tight italic">
+                1. Scan this QR code with your phone (or a teacher's phone).<br/>
+                2. Keep the Login page open (No login needed).<br/>
+                3. Click "EXECUTE" below and the phone will alert!
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-4">
             <div className="space-y-1">

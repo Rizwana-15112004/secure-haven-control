@@ -11,6 +11,7 @@ import { HelpChat } from "@/components/chat/HelpChat";
 import { EmergencyAlertProvider } from "@/contexts/EmergencyAlertContext";
 import { VolunteerAlertProvider, useVolunteerAlert } from "@/contexts/VolunteerAlertContext";
 import { VolunteerAlertOverlay } from "@/components/VolunteerAlertOverlay";
+import { RadiusAlertModal } from "@/components/modals/RadiusAlertModal";
 import { useOfflineSync } from './hooks/useOfflineSync';
 import { useRealtimeSync } from './hooks/useRealtimeSync';
 const queryClient = new QueryClient();
@@ -29,9 +30,18 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 // Renders the full-screen alert overlay on ALL connected devices
 function GlobalAlertListener() {
   useRealtimeSync(); // Activate Global Real-time Sync
-  const { incomingAlert, dismissAlert } = useVolunteerAlert();
-  if (!incomingAlert) return null;
-  return <VolunteerAlertOverlay alert={incomingAlert} onDismiss={dismissAlert} />;
+  const { incomingAlert, dismissAlert, proximityAlert, dismissProximity } = useVolunteerAlert();
+  
+  return (
+    <>
+      {incomingAlert && <VolunteerAlertOverlay alert={incomingAlert} onDismiss={dismissAlert} />}
+      <RadiusAlertModal 
+        isOpen={!!proximityAlert} 
+        onClose={dismissProximity} 
+        alertData={proximityAlert}
+      />
+    </>
+  );
 }
 
 const App = () => (

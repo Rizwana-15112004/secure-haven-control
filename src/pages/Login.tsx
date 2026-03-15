@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ShieldAlert, KeyRound, User } from "lucide-react";
+import { ShieldAlert, KeyRound, User, Siren, ShieldCheck, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { getBackendURL } from "@/config/api";
@@ -154,6 +154,27 @@ export default function Login() {
             </div>
           </form>
         </div>
+
+        {/* Public Alert Receiver - Crucial for "Non-App" Demo */}
+        <div className="bg-danger/10 border border-danger/30 rounded-xl p-4 flex items-center justify-between text-[11px] animate-in fade-in slide-in-from-top-4 duration-700">
+           <div className="flex items-center gap-3">
+             <div className="bg-danger/20 p-2 rounded-full animate-pulse">
+               <Siren className="h-4 w-4 text-danger" />
+             </div>
+             <div>
+               <p className="font-black text-danger uppercase tracking-tighter">Public Alert Receiver Active</p>
+               <p className="text-white/40">Monitoring local cellular emergency frequencies...</p>
+             </div>
+           </div>
+           <div className="flex items-center gap-1.5 bg-black/40 px-2 py-1 rounded border border-white/5">
+              <div className="h-1.5 w-1.5 bg-success rounded-full animate-ping" />
+              <span className="text-success font-bold uppercase text-[9px]">LIVE</span>
+           </div>
+        </div>
+
+        <p className="text-center text-[10px] text-white/20 uppercase tracking-[0.2em]">
+          SDRRS Local Network v4.2.0 • Secured by CEP
+        </p>
       </div>
     </div>
   );
