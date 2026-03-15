@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => ({
     VitePWA({
       strategies: 'injectManifest',
       srcDir: 'src',
-      filename: 'service-worker.js',
+      filename: 'sw.js',
       registerType: 'autoUpdate',
       devOptions: { enabled: true },
       includeAssets: ['favicon.ico', 'robots.txt'],
