@@ -16,7 +16,7 @@ export default function Login() {
   const [wakeLocked, setWakeLocked] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
-  const { connected } = useVolunteerAlert();
+  const { connected, armBackgroundSystem } = useVolunteerAlert();
 
   useEffect(() => {
     // 1. Request Notification Permissions for Background Alerts
@@ -211,13 +211,31 @@ export default function Login() {
                </div>
              )}
              {connected && (
-               <button 
-                 onClick={() => {
-                   if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
-                   toast({ title: "Signal Test", description: "Connection to Emergency Tower is stable. Background listening active." });
-                 }}
-                 className="text-[8px] text-white/20 underline hover:text-white/40 font-bold uppercase tracking-widest mt-1"
-               >Test Link</button>
+               <div className="flex flex-col items-end gap-2 mt-1">
+                 <Button 
+                   size="sm"
+                   variant="destructive"
+                   onClick={() => {
+                     armBackgroundSystem();
+                     if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
+                     toast({ 
+                       title: "SYSTEM ARMED", 
+                       description: "Emergency Listener is now protected from OS sleep modes. Keep this tab open.",
+                       variant: "default"
+                     });
+                   }}
+                   className="h-7 text-[9px] font-black uppercase tracking-widest bg-danger animate-pulse shadow-lg shadow-danger/40"
+                 >
+                   Arm Background System
+                 </Button>
+                 <button 
+                   onClick={() => {
+                     if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
+                     toast({ title: "Signal Test", description: "Connection to Emergency Tower is stable. Background listening active." });
+                   }}
+                   className="text-[8px] text-white/20 underline hover:text-white/40 font-bold uppercase tracking-widest"
+                 >Test Link</button>
+               </div>
              )}
            </div>
         </div>

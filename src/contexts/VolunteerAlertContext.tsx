@@ -27,6 +27,7 @@ interface VolunteerAlertContextType {
   triggerProximityAlert: (data: any) => void;
   dismissAlert: () => void;
   dismissProximity: () => void;
+  armBackgroundSystem: () => void;
 }
 
 const VolunteerAlertContext = createContext<VolunteerAlertContextType | undefined>(undefined);
@@ -36,6 +37,14 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
   const [deviceCount, setDeviceCount] = useState(0);
   const [incomingAlert, setIncomingAlert] = useState<VolunteerAlertPayload | null>(null);
   const [proximityAlert, setProximityAlert] = useState<any | null>(null);
+  const [keepAliveAudio] = useState(new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'));
+
+  const armBackgroundSystem = useCallback(() => {
+    keepAliveAudio.volume = 0.01; // Almost silent but keeps process alive
+    keepAliveAudio.loop = true;
+    keepAliveAudio.play().catch(e => console.log("Audio ARM failed:", e));
+    console.log("OS-Level Background Listener Armed via Audio Keep-Alive");
+  }, [keepAliveAudio]);
 
   useEffect(() => {
     if ('Notification' in window && Notification.permission === 'default') {
@@ -82,13 +91,18 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
             console.log("Received proximity-alert:", e.data);
             const data = JSON.parse(e.data);
             setProximityAlert(data);
-            if ('vibrate' in navigator) navigator.vibrate([500, 100, 500, 100, 500]);
+            
+            // WAKE UP OS AUDIO
+            keepAliveAudio.volume = 1.0;
+            keepAliveAudio.play().catch(() => {});
+            
+            if ('vibrate' in navigator) navigator.vibrate([1000, 200, 1000, 200, 1000]);
+
             if (Notification.permission === 'granted') {
-              // If tab is hidden or screen is off, trigger a system-level notification
               if (document.hidden) {
                 if ('serviceWorker' in navigator) {
                   navigator.serviceWorker.ready.then(registration => {
-                    registration.showNotification('🚨 DISASTER RADIUS ALERT', {
+                    (registration as any).showNotification('🚨 DISASTER RADIUS ALERT', {
                       body: `Emergency Alert: ${data.title}`,
                       icon: '/favicon.ico',
                       vibrate: [500, 100, 500, 100, 500],
@@ -160,7 +174,8 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
   return (
     <VolunteerAlertContext.Provider value={{ 
       connected, deviceCount, incomingAlert, proximityAlert, 
-      sendAlert, broadcastProximity, triggerProximityAlert, dismissAlert, dismissProximity 
+      sendAlert, broadcastProximity, triggerProximityAlert, dismissAlert, dismissProximity,
+      armBackgroundSystem
     }}>
       {children}
     </VolunteerAlertContext.Provider>
