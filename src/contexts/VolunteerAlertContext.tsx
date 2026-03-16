@@ -37,7 +37,21 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
   const [deviceCount, setDeviceCount] = useState(0);
   const [incomingAlert, setIncomingAlert] = useState<VolunteerAlertPayload | null>(null);
   const [proximityAlert, setProximityAlert] = useState<any | null>(null);
+  const [lastMessageTime, setLastMessageTime] = useState<number>(Date.now());
+  const [reconnectCount, setReconnectCount] = useState(0);
   const [keepAliveAudio] = useState(new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'));
+
+  // Logic to prevent mobile OS from killing the connection
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // If we haven't heard anything for 30 seconds, the OS might have killed the network
+      if (connected && Date.now() - lastMessageTime > 30000) {
+        console.warn("Background Signal Lost. Attempting Hard Reconnect...");
+        setReconnectCount(prev => prev + 1);
+      }
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [connected, lastMessageTime]);
 
   const armBackgroundSystem = useCallback(() => {
     keepAliveAudio.volume = 0.01; // Almost silent but keeps process alive
@@ -62,6 +76,7 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
         es.onopen = () => {
           console.log("SSE Connection opened");
           setConnected(true);
+          setLastMessageTime(Date.now());
         };
 
         es.onerror = () => {
@@ -71,7 +86,12 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
           retryTimer = setTimeout(connect, 3000);
         };
 
+        es.onmessage = () => {
+          setLastMessageTime(Date.now());
+        };
+
         es.addEventListener('count', (e: any) => {
+          setLastMessageTime(Date.now());
           try {
             const data = JSON.parse(e.data);
             setDeviceCount(data.count);
@@ -79,6 +99,7 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
         });
 
         es.addEventListener('alert', (e: any) => {
+          setLastMessageTime(Date.now());
           try {
             const alertData = JSON.parse(e.data) as VolunteerAlertPayload;
             setIncomingAlert(alertData);
@@ -87,6 +108,7 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
         });
 
         es.addEventListener('proximity-alert', (e: any) => {
+          setLastMessageTime(Date.now());
           try {
             console.log("Received proximity-alert:", e.data);
             const data = JSON.parse(e.data);
@@ -94,28 +116,34 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
             
             // WAKE UP OS AUDIO
             keepAliveAudio.volume = 1.0;
+            keepAliveAudio.currentTime = 0;
             keepAliveAudio.play().catch(() => {});
             
-            if ('vibrate' in navigator) navigator.vibrate([1000, 200, 1000, 200, 1000]);
+            // INTENSE VIBRATION
+            if ('vibrate' in navigator) {
+               navigator.vibrate([1000, 500, 1000, 500, 1000, 500, 2000]);
+            }
 
             if (Notification.permission === 'granted') {
+              const options = {
+                body: `EMERGENCY: ${data.title}\nLOCATION: ${data.location}`,
+                icon: '/favicon.ico',
+                badge: '/favicon.ico',
+                vibrate: [500, 100, 500, 100, 500, 100, 500],
+                tag: 'emergency-' + Date.now(),
+                requireInteraction: true,
+                silent: false,
+                renotify: true
+              };
+
               if (document.hidden) {
                 if ('serviceWorker' in navigator) {
                   navigator.serviceWorker.ready.then(registration => {
-                    (registration as any).showNotification('🚨 DISASTER RADIUS ALERT', {
-                      body: `Emergency Alert: ${data.title}`,
-                      icon: '/favicon.ico',
-                      vibrate: [500, 100, 500, 100, 500],
-                      tag: 'emergency-proximity-alert',
-                      requireInteraction: true
-                    });
+                    (registration as any).showNotification('🚨 DISASTER RADIUS ALERT', options);
                   });
                 }
               } else {
-                new Notification('🚨 DISASTER RADIUS ALERT', {
-                  body: `Emergency Alert: ${data.title}`,
-                  icon: '/favicon.ico',
-                });
+                new Notification('🚨 DISASTER RADIUS ALERT', options as any);
               }
             }
           } catch (err) {
@@ -136,7 +164,7 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
       clearTimeout(retryTimer);
       es?.close();
     };
-  }, []);
+  }, [keepAliveAudio, reconnectCount]);
 
   const sendAlert = useCallback(async (payload: Omit<VolunteerAlertPayload, 'timestamp' | 'deviceCount'>) => {
     try {
