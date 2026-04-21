@@ -17,16 +17,27 @@ export type VolunteerAlertPayload = {
   radius?: number;
 };
 
+export type StaffSosPayload = {
+  staffName: string;
+  floor: string;
+  injured: string;
+  details: string;
+  timestamp: number;
+  type?: string;
+};
+
 interface VolunteerAlertContextType {
   connected: boolean;
   deviceCount: number;
   incomingAlert: VolunteerAlertPayload | null;
   proximityAlert: any | null;
+  staffSosAlert: StaffSosPayload | null;
   sendAlert: (payload: Omit<VolunteerAlertPayload, 'timestamp' | 'deviceCount'>) => Promise<void>;
   broadcastProximity: (data: any) => Promise<any>;
   triggerProximityAlert: (data: any) => void;
   dismissAlert: () => void;
   dismissProximity: () => void;
+  dismissStaffSos: () => void;
   armBackgroundSystem: () => void;
 }
 
@@ -37,6 +48,7 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
   const [deviceCount, setDeviceCount] = useState(0);
   const [incomingAlert, setIncomingAlert] = useState<VolunteerAlertPayload | null>(null);
   const [proximityAlert, setProximityAlert] = useState<any | null>(null);
+  const [staffSosAlert, setStaffSosAlert] = useState<StaffSosPayload | null>(null);
   const [lastMessageTime, setLastMessageTime] = useState<number>(Date.now());
   const [reconnectCount, setReconnectCount] = useState(0);
   const [keepAliveAudio] = useState(new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'));
@@ -44,8 +56,8 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
   // Logic to prevent mobile OS from killing the connection
   useEffect(() => {
     const interval = setInterval(() => {
-      // If we haven't heard anything for 30 seconds, the OS might have killed the network
-      if (connected && Date.now() - lastMessageTime > 30000) {
+      // If we haven't heard anything for 5 minutes, the OS might have killed the network
+      if (connected && Date.now() - lastMessageTime > 300000) {
         console.warn("Background Signal Lost. Attempting Hard Reconnect...");
         setReconnectCount(prev => prev + 1);
       }
@@ -104,6 +116,24 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
             const alertData = JSON.parse(e.data) as VolunteerAlertPayload;
             setIncomingAlert(alertData);
             if ('vibrate' in navigator) navigator.vibrate([400, 200, 400, 200, 800]);
+          } catch (_) {}
+        });
+
+        es.addEventListener('staff_sos', (e: any) => {
+          setLastMessageTime(Date.now());
+          try {
+            const data = JSON.parse(e.data) as StaffSosPayload;
+            console.log('📟 Staff SOS received:', data);
+            setStaffSosAlert(data);
+            if ('vibrate' in navigator) navigator.vibrate([300, 100, 300, 100, 600]);
+            if (Notification.permission === 'granted') {
+              new Notification('🆘 Staff Emergency Alert', {
+                body: `${data.staffName} on Floor ${data.floor} needs help! Injured: ${data.injured}\n${data.details}`,
+                icon: '/favicon.ico',
+                requireInteraction: true,
+                tag: 'staff-sos-' + Date.now(),
+              } as any);
+            }
           } catch (_) {}
         });
 
@@ -197,13 +227,14 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
 
   const dismissAlert = useCallback(() => setIncomingAlert(null), []);
   const dismissProximity = useCallback(() => setProximityAlert(null), []);
+  const dismissStaffSos = useCallback(() => setStaffSosAlert(null), []);
   const triggerProximityAlert = useCallback((data: any) => setProximityAlert(data), []);
 
   return (
     <VolunteerAlertContext.Provider value={{ 
-      connected, deviceCount, incomingAlert, proximityAlert, 
+      connected, deviceCount, incomingAlert, proximityAlert, staffSosAlert,
       sendAlert, broadcastProximity, triggerProximityAlert, dismissAlert, dismissProximity,
-      armBackgroundSystem
+      dismissStaffSos, armBackgroundSystem
     }}>
       {children}
     </VolunteerAlertContext.Provider>

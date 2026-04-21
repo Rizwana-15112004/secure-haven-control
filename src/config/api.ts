@@ -8,9 +8,9 @@ export const getBackendURL = () => {
   }
 
   const ip = localStorage.getItem('serverIP') || window.location.hostname;
-  return `${window.location.protocol}//${ip}:8080`;
+  return `${window.location.protocol}//${ip}:3001`;
 };
 
 export const getAlertServerURL = () => {
-  return `${getBackendURL()}/api/alerts`;
+  return getBackendURL();
 };

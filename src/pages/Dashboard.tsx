@@ -25,6 +25,7 @@ import { AllOccupantsModal } from "@/components/modals/AllOccupantsModal";
 import { Button } from "@/components/ui/button";
 import { ProximityAlertPanel } from "@/components/dashboard/ProximityAlertPanel";
 import { RadiusAlertModal } from "@/components/modals/RadiusAlertModal";
+import { StaffEmergencyModal } from "@/components/modals/StaffEmergencyModal";
 import { useVolunteerAlert } from "@/hooks/useVolunteerAlert";
 import { 
   mockOccupants, 
@@ -51,7 +52,7 @@ import { toast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
   const { role } = useAuth();
-  const { unreadCount: staffAlertCount } = useEmergencyAlerts();
+  const { unreadCount: staffAlertCount, alerts: staffEmergencyAlerts, acknowledgeAlert: acknowledgeEmergencyAlert } = useEmergencyAlerts();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [menuOpen, setMenuOpen] = useState(false);
   
@@ -73,6 +74,9 @@ export default function Dashboard() {
 
   const activeAlerts = alerts.filter(a => a.isActive);
   const isEmergency = activeAlerts.some(a => a.level === 'critical' || a.level === 'danger');
+
+  // Find unacknowledged staff emergency alerts
+  const unacknowledgedStaffAlert = staffEmergencyAlerts.find(a => !a.acknowledged) || null;
 
   // Real-time volunteer alerts
   const { proximityAlert, dismissProximity } = useVolunteerAlert();
@@ -506,6 +510,11 @@ export default function Dashboard() {
           setAllOccupantsModalOpen(false);
           handleOccupantSelect(occupant);
         }}
+      />
+      <StaffEmergencyModal
+        isOpen={!!unacknowledgedStaffAlert && isAdmin} 
+        alert={unacknowledgedStaffAlert} 
+        onAcknowledge={acknowledgeEmergencyAlert} 
       />
       {/* Proximity Alert Modal for all users */}
     </div>

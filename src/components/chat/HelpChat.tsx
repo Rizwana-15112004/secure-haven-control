@@ -6,6 +6,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { X, Send, AlertTriangle, HeartHandshake, Shield } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEmergencyAlerts } from "@/contexts/EmergencyAlertContext";
+import { getAlertServerURL } from "@/config/api";
 import { db } from "@/db"; // <-- Import your new offline database here
 
 type Message = {
@@ -96,9 +97,7 @@ export function HelpChat() {
       addAlert(alertPayload);
 
       try {
-        const protocol = window.location.protocol;
-        const host = window.location.hostname;
-        const alertServer = localStorage.getItem('serverIP') ? `${protocol}//${localStorage.getItem('serverIP')}:3001` : `${protocol}//${host}:3001`;
+        const alertServer = getAlertServerURL();
         
         await fetch(`${alertServer}/send-alert`, {
           method: 'POST',

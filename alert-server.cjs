@@ -50,24 +50,26 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // ── Trigger endpoint: admin posts alert here
+  // ── Trigger endpoint: staff/admin posts alert here
   if (req.method === "POST" && req.url === "/send-alert") {
     let body = "";
     req.on("data", chunk => { body += chunk.toString(); });
     req.on("end", () => {
       try {
         const alertData = JSON.parse(body);
-        const payload = JSON.stringify({ type: "alert", ...alertData, deviceCount: clients.size });
+        const isStaffSOS = alertData.type === 'staff_sos' || alertData.type === 'staff_sos_delayed';
+        const eventName = isStaffSOS ? 'staff_sos' : 'alert';
+        const payload = JSON.stringify({ ...alertData, type: eventName, deviceCount: clients.size });
 
-        console.log(`🚨 ALERT sent to ${clients.size} devices`);
+        console.log(`🚨 ${eventName.toUpperCase()} sent to ${clients.size} devices`);
 
-        // Broadcast to ALL connected clients
+        // Broadcast as a NAMED SSE event so clients can distinguish types
         clients.forEach(client => {
-          try { client.write(`data: ${payload}\n\n`); } catch(_) {}
+          try { client.write(`event: ${eventName}\ndata: ${payload}\n\n`); } catch(_) {}
         });
 
         res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify({ ok: true, reached: clients.size }));
+        res.end(JSON.stringify({ ok: true, reached: clients.size, eventType: eventName }));
       } catch (e) {
         res.writeHead(400);
         res.end("Bad request");

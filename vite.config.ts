@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => ({
       srcDir: 'src',
       filename: 'service-worker.js',
       registerType: 'autoUpdate',
+      useCredentials: true,
       devOptions: { enabled: true },
       includeAssets: ['favicon.ico', 'robots.txt'],
       workbox: {

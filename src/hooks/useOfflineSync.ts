@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { db } from '@/db';
+import { getAlertServerURL } from '@/config/api';
 
 export const useOfflineSync = () => {
     useEffect(() => {
@@ -9,12 +10,12 @@ export const useOfflineSync = () => {
                 const pendingSOS = await db.sosQueue.toArray();
                 if (pendingSOS.length === 0) return; // Nothing to sync!
 
-                // 2. Get the Admin's IP address
-                const serverIP = localStorage.getItem('serverIP') || 'http://10.68.230.30:3001';
+                // 2. Get the target backend URL
+                const serverUrl = getAlertServerURL();
 
-                // 3. Try to send them to the Admin server
+                // 3. Try to send them to the server
                 for (const sos of pendingSOS) {
-                    const response = await fetch(`${serverIP}/send-alert`, {
+                    const response = await fetch(`${serverUrl}/send-alert`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ type: 'staff_sos_delayed', ...sos })
