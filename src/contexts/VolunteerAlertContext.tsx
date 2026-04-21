@@ -189,29 +189,73 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
     };
 
     connect();
+    
+    // Cross-tab Synchronization for Local Demo (BroadcastChannel)
+    const channel = new BroadcastChannel('sdrrs_network_sync');
+    channel.onmessage = (e) => {
+      const { type, data } = e.data;
+      if (type === 'VOLUNTEER_ALERT') {
+        console.log('📡 Cross-tab Volunteer Alert:', data);
+        setIncomingAlert(data);
+        if ('vibrate' in navigator) navigator.vibrate([400, 200, 400, 200, 800]);
+      } else if (type === 'PROXIMITY_ALERT') {
+        console.log('📡 Cross-tab Proximity Alert:', data);
+        setProximityAlert(data);
+        // Intensity vibration and audio waking...
+        keepAliveAudio.volume = 1.0;
+        keepAliveAudio.currentTime = 0;
+        keepAliveAudio.play().catch(() => {});
+        if ('vibrate' in navigator) navigator.vibrate([1000, 500, 1000, 500, 2000]);
+      } else if (type === 'DEVICE_PING') {
+        // Mock device count increment for local demo
+        setDeviceCount(prev => Math.max(prev, 1)); 
+      }
+    };
+    
+    // Periodic ping to show "connected" status in multiple tabs
+    const pingInterval = setInterval(() => {
+      channel.postMessage({ type: 'DEVICE_PING' });
+    }, 2000);
 
     return () => {
       clearTimeout(retryTimer);
+      clearInterval(pingInterval);
       es?.close();
+      channel.close();
     };
   }, [keepAliveAudio, reconnectCount]);
 
   const sendAlert = useCallback(async (payload: Omit<VolunteerAlertPayload, 'timestamp' | 'deviceCount'>) => {
+    const fullPayload = { 
+      ...payload, 
+      timestamp: new Date().toISOString(),
+      deviceCount: deviceCount || 1
+    };
+    
+    // 1. Sync across tabs immediately (Local Demo)
+    const channel = new BroadcastChannel('sdrrs_network_sync');
+    channel.postMessage({ type: 'VOLUNTEER_ALERT', data: fullPayload });
+    channel.close();
+
+    // 2. Try to hit the real server
     try {
       await fetch(`${SERVER}/send-alert`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          ...payload, 
-          timestamp: new Date().toISOString() 
-        }),
+        body: JSON.stringify(fullPayload),
       });
     } catch (e) {
-      console.error('Failed to send alert', e);
+      console.warn('Network server unreachable, relying on local broadcast.');
     }
-  }, []);
+  }, [deviceCount]);
 
   const broadcastProximity = useCallback(async (data: any) => {
+    // 1. Sync across tabs immediately (Local Demo)
+    const channel = new BroadcastChannel('sdrrs_network_sync');
+    channel.postMessage({ type: 'PROXIMITY_ALERT', data });
+    channel.close();
+
+    // 2. Try to hit the real server
     try {
       const response = await fetch(`${SERVER}/broadcast-proximity`, {
         method: 'POST',
@@ -220,8 +264,8 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
       });
       return await response.json();
     } catch (e) {
-      console.error('Failed to broadcast proximity alert', e);
-      throw e;
+      console.warn('Network server unreachable, relying on local broadcast.');
+      return { ok: true, localOnly: true };
     }
   }, []);
 
