@@ -5,8 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { AlertTriangle, User, MapPin, Heart, FileText, CheckCheck, Trash2, Clock } from "lucide-react";
 
-function formatTime(date: Date) {
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+function formatTime(date: Date | string) {
+  const d = new Date(date);
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
 function AlertCard({ alert, onAck, onClear }: { alert: EmergencyAlert; onAck: () => void; onClear: () => void }) {

@@ -1,7 +1,5 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { getAlertServerURL } from '@/config/api';
-
-const SERVER = getAlertServerURL();
+import { supabase } from '@/integrations/supabase/client';
 
 export type VolunteerAlertPayload = {
   id?: number;
@@ -77,122 +75,92 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
       Notification.requestPermission();
     }
 
-    let es: EventSource;
-    let retryTimer: ReturnType<typeof setTimeout>;
+    const channel = supabase.channel('sdrrs_global_events', {
+      config: {
+        presence: {
+          key: Math.random().toString(), // Tracking unique device explicitly
+        },
+      },
+    });
 
-    const connect = () => {
-      try {
-        console.log("Connecting to SSE:", `${SERVER}/events`);
-        es = new EventSource(`${SERVER}/events`);
+    channel
+      .on('presence', { event: 'sync' }, () => {
+        const newState = channel.presenceState();
+        let totalDevices = 0;
+        for (const id in newState) {
+          totalDevices += newState[id].length;
+        }
+        setDeviceCount(totalDevices);
+        setConnected(true);
+      })
+      .on('broadcast', { event: 'alert' }, ({ payload }) => {
+        setIncomingAlert(payload);
+        if ('vibrate' in navigator) navigator.vibrate([400, 200, 400, 200, 800]);
+      })
+      .on('broadcast', { event: 'staff_sos' }, ({ payload }) => {
+        setLastMessageTime(Date.now());
+        console.log('📟 Staff SOS received via Supabase:', payload);
+        setStaffSosAlert(payload);
+        if ('vibrate' in navigator) navigator.vibrate([300, 100, 300, 100, 600]);
+        if (Notification.permission === 'granted') {
+          new Notification('🆘 Staff Emergency Alert', {
+            body: `${payload.staffName} on Floor ${payload.floor} needs help! Injured: ${payload.injured}\n${payload.details}`,
+            icon: '/favicon.ico',
+            requireInteraction: true,
+            tag: 'staff-sos-' + Date.now(),
+          } as any);
+        }
+      })
+      .on('broadcast', { event: 'proximity-alert' }, ({ payload }) => {
+        setLastMessageTime(Date.now());
+        console.log("Received proximity-alert via Supabase:", payload);
+        setProximityAlert(payload);
+        
+        keepAliveAudio.volume = 1.0;
+        keepAliveAudio.currentTime = 0;
+        keepAliveAudio.play().catch(() => {});
+        
+        if ('vibrate' in navigator) {
+           navigator.vibrate([1000, 500, 1000, 500, 1000, 500, 2000]);
+        }
 
-        es.onopen = () => {
-          console.log("SSE Connection opened");
-          setConnected(true);
-          setLastMessageTime(Date.now());
-        };
+        if (Notification.permission === 'granted') {
+          const options = {
+            body: `EMERGENCY: ${payload.title}\nLOCATION: ${payload.location}`,
+            icon: '/favicon.ico',
+            badge: '/favicon.ico',
+            vibrate: [500, 100, 500, 100, 500, 100, 500],
+            tag: 'emergency-' + Date.now(),
+            requireInteraction: true,
+            silent: false,
+            renotify: true
+          };
 
-        es.onerror = () => {
-          console.log("SSE Connection error, retrying...");
-          setConnected(false);
-          es.close();
-          retryTimer = setTimeout(connect, 3000);
-        };
-
-        es.onmessage = () => {
-          setLastMessageTime(Date.now());
-        };
-
-        es.addEventListener('count', (e: any) => {
-          setLastMessageTime(Date.now());
-          try {
-            const data = JSON.parse(e.data);
-            setDeviceCount(data.count);
-          } catch (_) {}
-        });
-
-        es.addEventListener('alert', (e: any) => {
-          setLastMessageTime(Date.now());
-          try {
-            const alertData = JSON.parse(e.data) as VolunteerAlertPayload;
-            setIncomingAlert(alertData);
-            if ('vibrate' in navigator) navigator.vibrate([400, 200, 400, 200, 800]);
-          } catch (_) {}
-        });
-
-        es.addEventListener('staff_sos', (e: any) => {
-          setLastMessageTime(Date.now());
-          try {
-            const data = JSON.parse(e.data) as StaffSosPayload;
-            console.log('📟 Staff SOS received:', data);
-            setStaffSosAlert(data);
-            if ('vibrate' in navigator) navigator.vibrate([300, 100, 300, 100, 600]);
-            if (Notification.permission === 'granted') {
-              new Notification('🆘 Staff Emergency Alert', {
-                body: `${data.staffName} on Floor ${data.floor} needs help! Injured: ${data.injured}\n${data.details}`,
-                icon: '/favicon.ico',
-                requireInteraction: true,
-                tag: 'staff-sos-' + Date.now(),
-              } as any);
+          if (document.hidden) {
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.ready.then(registration => {
+                (registration as any).showNotification('🚨 DISASTER RADIUS ALERT', options);
+              });
             }
-          } catch (_) {}
-        });
-
-        es.addEventListener('proximity-alert', (e: any) => {
-          setLastMessageTime(Date.now());
-          try {
-            console.log("Received proximity-alert:", e.data);
-            const data = JSON.parse(e.data);
-            setProximityAlert(data);
-            
-            // WAKE UP OS AUDIO
-            keepAliveAudio.volume = 1.0;
-            keepAliveAudio.currentTime = 0;
-            keepAliveAudio.play().catch(() => {});
-            
-            // INTENSE VIBRATION
-            if ('vibrate' in navigator) {
-               navigator.vibrate([1000, 500, 1000, 500, 1000, 500, 2000]);
-            }
-
-            if (Notification.permission === 'granted') {
-              const options = {
-                body: `EMERGENCY: ${data.title}\nLOCATION: ${data.location}`,
-                icon: '/favicon.ico',
-                badge: '/favicon.ico',
-                vibrate: [500, 100, 500, 100, 500, 100, 500],
-                tag: 'emergency-' + Date.now(),
-                requireInteraction: true,
-                silent: false,
-                renotify: true
-              };
-
-              if (document.hidden) {
-                if ('serviceWorker' in navigator) {
-                  navigator.serviceWorker.ready.then(registration => {
-                    (registration as any).showNotification('🚨 DISASTER RADIUS ALERT', options);
-                  });
-                }
-              } else {
-                new Notification('🚨 DISASTER RADIUS ALERT', options as any);
-              }
-            }
-          } catch (err) {
-            console.error("Error parsing proximity alert:", err);
+          } else {
+            new Notification('🚨 DISASTER RADIUS ALERT', options as any);
           }
-        });
-
-      } catch (err) {
-        console.error("SSE Startup Error:", err);
-        setConnected(false);
-        retryTimer = setTimeout(connect, 3000);
-      }
-    };
-
-    connect();
+        }
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log("Connected to Supabase Realtime SDRRS global event mesh");
+          await channel.track({ online_at: new Date().toISOString() });
+        }
+        if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+           setConnected(false);
+           setReconnectCount(prev => prev + 1);
+        }
+      });
     
     // Cross-tab Synchronization for Local Demo (BroadcastChannel)
-    const channel = new BroadcastChannel('sdrrs_network_sync');
-    channel.onmessage = (e) => {
+    const bcChannel = new BroadcastChannel('sdrrs_network_sync');
+    bcChannel.onmessage = (e) => {
       const { type, data } = e.data;
       if (type === 'VOLUNTEER_ALERT') {
         console.log('📡 Cross-tab Volunteer Alert:', data);
@@ -206,6 +174,10 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
         keepAliveAudio.currentTime = 0;
         keepAliveAudio.play().catch(() => {});
         if ('vibrate' in navigator) navigator.vibrate([1000, 500, 1000, 500, 2000]);
+      } else if (type === 'STAFF_SOS') {
+        console.log('📡 Cross-tab Staff SOS:', data);
+        setStaffSosAlert(data);
+        if ('vibrate' in navigator) navigator.vibrate([300, 100, 300, 100, 600]);
       } else if (type === 'DEVICE_PING') {
         // Mock device count increment for local demo
         setDeviceCount(prev => Math.max(prev, 1)); 
@@ -214,14 +186,13 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
     
     // Periodic ping to show "connected" status in multiple tabs
     const pingInterval = setInterval(() => {
-      channel.postMessage({ type: 'DEVICE_PING' });
+      bcChannel.postMessage({ type: 'DEVICE_PING' });
     }, 2000);
 
     return () => {
-      clearTimeout(retryTimer);
       clearInterval(pingInterval);
-      es?.close();
-      channel.close();
+      supabase.removeChannel(channel); // Refers to the supabase channel from line 80
+      bcChannel.close();
     };
   }, [keepAliveAudio, reconnectCount]);
 
@@ -237,12 +208,11 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
     channel.postMessage({ type: 'VOLUNTEER_ALERT', data: fullPayload });
     channel.close();
 
-    // 2. Try to hit the real server
     try {
-      await fetch(`${SERVER}/send-alert`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(fullPayload),
+      await supabase.channel('sdrrs_global_events').send({
+        type: 'broadcast',
+        event: 'alert',
+        payload: fullPayload,
       });
     } catch (e) {
       console.warn('Network server unreachable, relying on local broadcast.');
@@ -255,14 +225,14 @@ export function VolunteerAlertProvider({ children }: { children: ReactNode }) {
     channel.postMessage({ type: 'PROXIMITY_ALERT', data });
     channel.close();
 
-    // 2. Try to hit the real server
+    // 2. Global Sync via Supabase Broadcast
     try {
-      const response = await fetch(`${SERVER}/broadcast-proximity`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+      await supabase.channel('sdrrs_global_events').send({
+        type: 'broadcast',
+        event: 'proximity-alert',
+        payload: data,
       });
-      return await response.json();
+      return { ok: true };
     } catch (e) {
       console.warn('Network server unreachable, relying on local broadcast.');
       return { ok: true, localOnly: true };

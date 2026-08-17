@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEmergencyAlerts } from "@/contexts/EmergencyAlertContext";
 import { getAlertServerURL } from "@/config/api";
 import { db } from "@/db"; // <-- Import your new offline database here
+import { supabase } from "@/integrations/supabase/client";
 
 type Message = {
   id: string;
@@ -93,18 +94,22 @@ export function HelpChat() {
         timestamp: Date.now() // Add a timestamp for the offline queue
       };
 
-      // 1. Keep pushing to global context so it updates the local UI immediately
+      // 1. Instant cross-tab broadcast (works even offline, same device)
+      const bc = new BroadcastChannel('sdrrs_network_sync');
+      bc.postMessage({ type: 'STAFF_SOS', data: alertPayload });
+      bc.close();
+
+      // 2. Keep pushing to global context so it updates the local staff UI immediately
       addAlert(alertPayload);
 
       try {
-        const alertServer = getAlertServerURL();
-        
-        await fetch(`${alertServer}/send-alert`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'staff_sos', ...alertPayload })
+        // 3. Cross-device sync via Supabase Realtime broadcast
+        await supabase.channel('sdrrs_global_events').send({
+          type: 'broadcast',
+          event: 'staff_sos',
+          payload: alertPayload,
         });
-        console.log("SOS sent securely to the Command Center!");
+        console.log("SOS sent securely to the Command Center via Supabase!");
       } catch (error) {
         console.warn("User is offline. Saving SOS to local queue for background sync.");
         await db.sosQueue.add(alertPayload);
